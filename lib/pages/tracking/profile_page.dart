@@ -43,7 +43,7 @@ class ProfilePage extends StatelessWidget {
                       child: Text(
                         'Profil Pengguna',
                         style: TextStyle(
-                          fontSize: 24,
+                          fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
@@ -94,7 +94,7 @@ class ProfilePage extends StatelessWidget {
                             ),
                             const SizedBox(height: 25),
                             const Text(
-                              'Pengguna Kurir Desa',
+                              'Rizky Hamdana',
                               style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
@@ -115,7 +115,7 @@ class ProfilePage extends StatelessWidget {
                                 ),
                               ),
                               child: const Text(
-                                '⭐ Member sejak 2024',
+                                '⭐ Member sejak 2025',
                                 style: TextStyle(
                                   color: Color(0xFF00BCD4),
                                   fontSize: 14,
@@ -247,7 +247,7 @@ class ProfilePage extends StatelessWidget {
                             _buildContactRow(
                               Icons.email_rounded,
                               'Email',
-                              'info@kurirdesa.com',
+                              'info@kuriratapange.com',
                             ),
                           ],
                         ),
@@ -645,7 +645,7 @@ class ProfilePage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          '🚚 Kurir Desa v1.0.0',
+                          '🛵 Kurir Atapange v1.0.0',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -654,7 +654,7 @@ class ProfilePage extends StatelessWidget {
                         ),
                         const SizedBox(height: 15),
                         Text(
-                          'Aplikasi ini dibuat untuk membantu warga desa dalam pengiriman barang dari toko ke rumah, terutama untuk pembelian melalui grup WhatsApp.',
+                          'Aplikasi ini dibuat untuk membantu warga Atapange dalam pengiriman barang dari toko ke rumah, terutama untuk pembelian melalui grup WhatsApp.',
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.white.withAlpha(204),
@@ -688,7 +688,7 @@ class ProfilePage extends StatelessWidget {
                             ),
                           ),
                           child: const Text(
-                            '💚 Dikembangkan dengan ❤️ untuk kemudahan warga desa',
+                            'Dikembangkan untuk kemudahan warga desa',
                             style: TextStyle(
                               color: Color(0xFF43e97b),
                               fontSize: 14,

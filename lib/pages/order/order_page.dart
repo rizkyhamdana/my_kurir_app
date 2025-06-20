@@ -23,6 +23,13 @@ class _OrderPageState extends State<OrderPage> {
   String _jenisBarang = 'Makanan/Minuman';
   bool _isUrgent = false;
 
+  final List<Map<String, dynamic>> _kurirList = [
+    {'nama': 'Pak Budi', 'isOnline': true, 'phone': '081234567890'},
+    {'nama': 'Pak Andi', 'isOnline': false, 'phone': '081298765432'},
+    {'nama': 'Mas Joko', 'isOnline': true, 'phone': '081212345678'},
+  ];
+  String? _selectedKurir;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,9 +65,9 @@ class _OrderPageState extends State<OrderPage> {
                     const SizedBox(width: 20),
                     const Expanded(
                       child: Text(
-                        'Pesan Kurir Desa',
+                        'Pesan Kurir Atapange',
                         style: TextStyle(
-                          fontSize: 24,
+                          fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
@@ -104,9 +111,9 @@ class _OrderPageState extends State<OrderPage> {
                               ),
                               const SizedBox(height: 20),
                               const Text(
-                                'Kurir Desa Siap Membantu!',
+                                'Kurir Atapange Siap Membantu!',
                                 style: TextStyle(
-                                  fontSize: 22,
+                                  fontSize: 20,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
                                 ),
@@ -116,7 +123,7 @@ class _OrderPageState extends State<OrderPage> {
                               Text(
                                 'Pesan barang di grup WA? Kami antar sampai rumah dengan aman dan cepat',
                                 style: TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 14,
                                   color: Colors.white.withAlpha(179),
                                   height: 1.4,
                                 ),
@@ -312,7 +319,75 @@ class _OrderPageState extends State<OrderPage> {
                           maxLines: 3,
                         ),
                         const SizedBox(height: 20),
-
+                        _buildSectionTitle('🚴‍♂️ Pilih Kurir'),
+                        const SizedBox(height: 15),
+                        GlassContainer(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ..._kurirList.map((kurir) {
+                                final isOnline = kurir['isOnline'] as bool;
+                                return RadioListTile<String>(
+                                  value: kurir['nama'],
+                                  groupValue: _selectedKurir,
+                                  onChanged: isOnline
+                                      ? (val) =>
+                                            setState(() => _selectedKurir = val)
+                                      : null,
+                                  title: Row(
+                                    children: [
+                                      Text(
+                                        kurir['nama'],
+                                        style: TextStyle(
+                                          color: isOnline
+                                              ? Colors.white
+                                              : Colors.white54,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 2,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: isOnline
+                                              ? Colors.green
+                                              : Colors.grey,
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          isOnline ? 'Online' : 'Offline',
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  subtitle: Text(
+                                    kurir['phone'],
+                                    style: TextStyle(
+                                      color: isOnline
+                                          ? Colors.white70
+                                          : Colors.white38,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                  activeColor: const Color(0xFF667eea),
+                                );
+                              }),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 30),
                         // Urgent Checkbox
                         GlassContainer(
                           width: double.infinity,

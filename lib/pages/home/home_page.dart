@@ -69,14 +69,14 @@ class _HomePageState extends State<HomePage>
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Selamat Datang',
+                                  'Selamat Datang di Aplikasi',
                                   style: TextStyle(
                                     fontSize: 16,
                                     color: Colors.white.withAlpha(179),
                                   ),
                                 ),
                                 const Text(
-                                  'Kurir Desa',
+                                  'Kurir Atapange',
                                   style: TextStyle(
                                     fontSize: 32,
                                     fontWeight: FontWeight.bold,
@@ -134,7 +134,7 @@ class _HomePageState extends State<HomePage>
                               ),
                               const SizedBox(height: 20),
                               const Text(
-                                'Solusi Pengiriman\nModern untuk Desa',
+                                'Solusi Pengiriman\nuntuk Desa',
                                 style: TextStyle(
                                   fontSize: 28,
                                   fontWeight: FontWeight.bold,

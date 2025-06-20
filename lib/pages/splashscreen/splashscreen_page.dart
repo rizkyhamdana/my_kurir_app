@@ -79,25 +79,25 @@ class _SplashScreenPageState extends State<SplashScreenPage>
                             shape: BoxShape.circle,
                             gradient: LinearGradient(
                               colors: [
-                                Colors.white.withOpacity(0.35),
-                                Colors.white.withOpacity(0.10),
+                                Colors.white.withAlpha(90),
+                                Colors.white.withAlpha(27),
                               ],
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.08),
+                                color: Colors.black.withAlpha(16),
                                 blurRadius: 24,
                                 offset: const Offset(0, 8),
                               ),
                             ],
                           ),
                           padding: const EdgeInsets.all(22),
-                          child: Icon(
-                            Icons.local_shipping_rounded,
-                            size: 90,
-                            color: Color(0xFF667eea),
+                          child: const Icon(
+                            Icons.delivery_dining_rounded,
+                            size: 40,
+                            color: Colors.white,
                           ),
                         ),
                       ),
@@ -112,7 +112,7 @@ class _SplashScreenPageState extends State<SplashScreenPage>
                           letterSpacing: 2.5,
                           shadows: [
                             Shadow(
-                              color: Colors.black.withOpacity(0.18),
+                              color: Colors.black.withAlpha(50),
                               blurRadius: 10,
                               offset: Offset(0, 2),
                             ),
@@ -125,7 +125,7 @@ class _SplashScreenPageState extends State<SplashScreenPage>
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 15,
-                          color: Colors.white.withOpacity(0.85),
+                          color: Colors.white.withAlpha(180),
                           fontWeight: FontWeight.w400,
                           letterSpacing: 1,
                         ),
@@ -135,7 +135,7 @@ class _SplashScreenPageState extends State<SplashScreenPage>
                         valueColor: AlwaysStoppedAnimation<Color>(
                           Color(0xFF667eea),
                         ),
-                        backgroundColor: Colors.white.withOpacity(0.18),
+                        backgroundColor: Colors.white.withAlpha(50),
                         strokeWidth: 3,
                       ),
                     ],

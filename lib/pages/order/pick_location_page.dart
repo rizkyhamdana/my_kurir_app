@@ -45,8 +45,9 @@ class _PickLocationPageState extends State<PickLocationPage> {
           ? const Center(child: CircularProgressIndicator())
           : FlutterMap(
               options: MapOptions(
-                center: _pickedLatLng ?? _currentLatLng,
-                zoom: 16,
+                initialCenter:
+                    _pickedLatLng ?? _currentLatLng ?? LatLng(50.5, 30.51),
+                initialZoom: 16,
                 onTap: (tapPosition, point) {
                   setState(() {
                     _pickedLatLng = point;

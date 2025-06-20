@@ -81,9 +81,9 @@ class _TrackingPageState extends State<TrackingPage> {
                     const SizedBox(width: 20),
                     const Expanded(
                       child: Text(
-                        'Lacak Kurir Desa',
+                        'Lacak Kurir Atapange',
                         style: TextStyle(
-                          fontSize: 24,
+                          fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
@@ -659,7 +659,7 @@ class _TrackingPageState extends State<TrackingPage> {
                       child: Text(
                         'Lacak Pesanan',
                         style: TextStyle(
-                          fontSize: 24,
+                          fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
