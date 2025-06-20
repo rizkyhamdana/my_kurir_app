@@ -1,0 +1,24 @@
+name: my_kurir_app
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.8.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+  go_router: ^15.2.3
+  zikzak_inappwebview: ^2.4.8
+  flutter_map: ^6.1.0
+  latlong2: ^0.9.0
+  geolocator: ^14.0.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true

@@ -1,0 +1,40 @@
+PODS:
+  - Flutter (1.0.0)
+  - geolocator_apple (1.2.0):
+    - Flutter
+    - FlutterMacOS
+  - OrderedSet (6.0.3)
+  - zikzak_inappwebview_ios (2.4.8):
+    - Flutter
+    - OrderedSet (>= 6.0.3)
+    - zikzak_inappwebview_ios/Core (= 2.4.8)
+  - zikzak_inappwebview_ios/Core (2.4.8):
+    - Flutter
+    - OrderedSet (>= 6.0.3)
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - geolocator_apple (from `.symlinks/plugins/geolocator_apple/darwin`)
+  - zikzak_inappwebview_ios (from `.symlinks/plugins/zikzak_inappwebview_ios/ios`)
+
+SPEC REPOS:
+  trunk:
+    - OrderedSet
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  geolocator_apple:
+    :path: ".symlinks/plugins/geolocator_apple/darwin"
+  zikzak_inappwebview_ios:
+    :path: ".symlinks/plugins/zikzak_inappwebview_ios/ios"
+
+SPEC CHECKSUMS:
+  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
+  geolocator_apple: 66b711889fd333205763b83c9dcf0a57a28c7afd
+  OrderedSet: e539b66b644ff081c73a262d24ad552a69be3a94
+  zikzak_inappwebview_ios: 08950665f989afd7917232e5443d24d51f285054
+
+PODFILE CHECKSUM: 251cb053df7158f337c0712f2ab29f4e0fa474ce
+
+COCOAPODS: 1.16.2
