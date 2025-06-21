@@ -31,7 +31,7 @@ class _SplashScreenPageState extends State<SplashScreenPage>
     _controller.forward();
 
     Future.delayed(const Duration(milliseconds: 4000), () {
-      if (mounted) context.go('/home');
+      if (mounted) context.go('/login');
     });
   }
 

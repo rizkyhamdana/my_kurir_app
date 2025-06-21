@@ -33,10 +33,8 @@ class MainApp extends StatelessWidget {
         primaryColor: const Color(0xFF4A80F0),
         colorScheme: ColorScheme.light(
           primary: const Color(0xFF4A80F0),
-          secondary: const Color(0xFF4A80F0).withOpacity(0.8),
+          secondary: const Color(0xFF4A80F0).withAlpha(170),
           surface: Colors.white,
-          background: const Color(0xFFF8F9FB),
-          onBackground: Colors.black87,
           onSurface: Colors.black87,
         ),
         appBarTheme: const AppBarTheme(
@@ -103,10 +101,8 @@ class MainApp extends StatelessWidget {
         primaryColor: const Color(0xFF4A80F0),
         colorScheme: ColorScheme.dark(
           primary: const Color(0xFF4A80F0),
-          secondary: const Color(0xFF4A80F0).withOpacity(0.8),
+          secondary: const Color(0xFF4A80F0).withAlpha(170),
           surface: const Color(0xFF1D1E33),
-          background: const Color(0xFF0A0E21),
-          onBackground: Colors.white,
           onSurface: Colors.white,
         ),
         appBarTheme: const AppBarTheme(

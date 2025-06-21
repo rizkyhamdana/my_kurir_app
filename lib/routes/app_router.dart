@@ -1,86 +1,65 @@
 import 'package:go_router/go_router.dart';
-import 'package:flutter/material.dart';
-import 'package:my_kurir_app/pages/order/pick_location_page.dart';
-import 'package:my_kurir_app/pages/profile/tracking_page.dart';
-import 'package:my_kurir_app/pages/splashscreen/splashscreen_page.dart';
-import 'package:my_kurir_app/pages/tracking/profile_page.dart';
+import 'package:my_kurir_app/pages/auth/login_page.dart';
+import 'package:my_kurir_app/pages/history/history_page.dart';
+import 'package:my_kurir_app/pages/kurir/kurir_history_page.dart';
+import 'package:my_kurir_app/pages/kurir/kurir_home_page.dart';
+import 'package:my_kurir_app/pages/kurir/kurir_profile_page.dart';
+import 'package:my_kurir_app/pages/kurir/kurir_tracking_page.dart';
+import '../pages/splashscreen/splashscreen_page.dart';
 import '../pages/home/home_page.dart';
 import '../pages/order/order_page.dart';
+import '../pages/order/pick_location_page.dart';
+import '../pages/profile/tracking_page.dart';
+import '../pages/tracking/profile_page.dart';
 import '../models/order_model.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
-    initialLocation: '/',
+    initialLocation: '/splash',
     routes: [
-      // Home Route
       GoRoute(
-        path: '/',
-        name: 'splash',
-        pageBuilder: (context, state) => CustomTransitionPage(
-          child: const SplashScreenPage(),
-          transitionDuration: const Duration(milliseconds: 1000),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-        ),
+        path: '/splash',
+        builder: (context, state) => const SplashScreenPage(),
       ),
+      GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
+      GoRoute(path: '/', redirect: (context, state) => '/home'),
+      GoRoute(path: '/home', builder: (context, state) => const HomePage()),
       GoRoute(
-        path: '/home',
-        name: 'home',
-        pageBuilder: (context, state) => CustomTransitionPage(
-          transitionDuration: const Duration(milliseconds: 1000),
-          child: const HomePage(),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-        ),
+        path: '/history',
+        builder: (context, state) => const HistoryPage(),
       ),
-
-      // Order Route
+      GoRoute(path: '/order', builder: (context, state) => const OrderPage()),
       GoRoute(
-        path: '/order',
-        name: 'order',
-        builder: (context, state) => const OrderPage(),
+        path: '/pick-location',
+        builder: (context, state) => const PickLocationPage(),
       ),
-
-      // Tracking Route
       GoRoute(
         path: '/tracking',
-        name: 'tracking',
         builder: (context, state) {
           final orderData = state.extra as OrderModel?;
           return TrackingPage(orderData: orderData);
         },
       ),
       GoRoute(
-        path: '/pick-location',
-        name: 'pick-location',
-        builder: (context, state) => const PickLocationPage(),
+        path: '/kurir-home',
+        builder: (context, state) => const KurirHomePage(),
       ),
-      // Profile Route
+      GoRoute(
+        path: '/kurir-tracking',
+        builder: (context, state) => const KurirTrackingPage(),
+      ),
+      GoRoute(
+        path: '/kurir-history',
+        builder: (context, state) => const KurirHistoryPage(),
+      ),
+      GoRoute(
+        path: '/kurir-profile',
+        builder: (context, state) => const KurirProfilePage(),
+      ),
       GoRoute(
         path: '/profile',
-        name: 'profile',
         builder: (context, state) => const ProfilePage(),
       ),
     ],
-    errorBuilder: (context, state) => Scaffold(
-      appBar: AppBar(title: const Text('Error')),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.error, size: 64, color: Colors.red),
-            const SizedBox(height: 16),
-            Text('Halaman tidak ditemukan: ${state.error}'),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () => context.go('/'),
-              child: const Text('Kembali ke Beranda'),
-            ),
-          ],
-        ),
-      ),
-    ),
   );
 }
