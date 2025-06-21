@@ -1,53 +1,51 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'dart:ui';
 
 class GlassContainer extends StatelessWidget {
   final Widget child;
   final double? width;
   final double? height;
-  final EdgeInsetsGeometry? padding;
-  final EdgeInsetsGeometry? margin;
-  final BorderRadius? borderRadius;
+  final EdgeInsetsGeometry padding;
   final double blur;
-  final int alpha;
-  final Color? color;
-  final Border? border;
+  final double alpha;
+  final BorderRadius? borderRadius;
 
   const GlassContainer({
     super.key,
     required this.child,
     this.width,
     this.height,
-    this.padding,
-    this.margin,
+    this.padding = const EdgeInsets.all(16),
+    this.blur = 10,
+    this.alpha = 20,
     this.borderRadius,
-    this.blur = 10.0,
-    this.alpha = 26,
-    this.color,
-    this.border,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: width,
-      height: height,
-      margin: margin,
-      child: ClipRRect(
-        borderRadius: borderRadius ?? BorderRadius.circular(20),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
-          child: Container(
-            padding: padding ?? const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: color ?? Colors.white.withAlpha(alpha.toInt()),
-              borderRadius: borderRadius ?? BorderRadius.circular(20),
-              border:
-                  border ??
-                  Border.all(color: Colors.white.withAlpha(51), width: 1),
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    return ClipRRect(
+      borderRadius: borderRadius ?? BorderRadius.circular(20),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
+        child: Container(
+          width: width,
+          height: height,
+          padding: padding,
+          decoration: BoxDecoration(
+            color: isDarkMode
+                ? Colors.white.withAlpha(alpha.toInt())
+                : Colors.black.withAlpha((alpha * 0.5).toInt()),
+            borderRadius: borderRadius ?? BorderRadius.circular(20),
+            border: Border.all(
+              color: isDarkMode
+                  ? Colors.white.withAlpha((alpha * 2).toInt())
+                  : Colors.white.withAlpha((alpha * 3).toInt()),
+              width: 1.5,
             ),
-            child: child,
           ),
+          child: child,
         ),
       ),
     );

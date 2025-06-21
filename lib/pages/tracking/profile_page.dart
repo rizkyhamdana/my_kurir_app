@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:my_kurir_app/main.dart';
 import '../../widgets/glass_container.dart';
 import 'dart:ui';
 
@@ -8,13 +9,25 @@ class ProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFF0A0E21), Color(0xFF1D1E33), Color(0xFF0A0E21)],
+            colors: isDarkMode
+                ? [
+                    const Color(0xFF0A0E21),
+                    const Color(0xFF1D1E33),
+                    const Color(0xFF0A0E21),
+                  ]
+                : [
+                    const Color(0xFFE8F0FE),
+                    const Color(0xFFF8F9FB),
+                    const Color(0xFFE8F0FE),
+                  ],
           ),
         ),
         child: SafeArea(
@@ -31,23 +44,32 @@ class ProfilePage extends StatelessWidget {
                         width: 50,
                         height: 50,
                         padding: const EdgeInsets.all(12),
-                        child: const Icon(
+                        child: Icon(
                           Icons.arrow_back_rounded,
-                          color: Colors.white,
+                          color: isDarkMode ? Colors.white : Colors.black87,
                           size: 24,
                         ),
                       ),
                     ),
                     const SizedBox(width: 20),
-                    const Expanded(
+                    Expanded(
                       child: Text(
                         'Profil Pengguna',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: isDarkMode ? Colors.white : Colors.black87,
                         ),
                       ),
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        isDarkMode ? Icons.light_mode : Icons.dark_mode,
+                        color: isDarkMode ? Colors.white : Colors.black87,
+                      ),
+                      onPressed: () {
+                        themeNotifier.toggleTheme();
+                      },
                     ),
                   ],
                 ),
@@ -86,19 +108,21 @@ class ProfilePage extends StatelessWidget {
                                   ),
                                 ],
                               ),
-                              child: const Icon(
+                              child: Icon(
                                 Icons.person_rounded,
                                 size: 50,
-                                color: Colors.white,
+                                color: isDarkMode ? Colors.white : Colors.white,
                               ),
                             ),
                             const SizedBox(height: 25),
-                            const Text(
+                            Text(
                               'Rizky Hamdana',
                               style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                                color: isDarkMode
+                                    ? Colors.white
+                                    : Colors.black87,
                               ),
                             ),
                             const SizedBox(height: 8),
@@ -130,6 +154,7 @@ class ProfilePage extends StatelessWidget {
 
                       // Menu Items
                       _buildModernMenuItem(
+                        context,
                         icon: Icons.history_rounded,
                         title: 'Riwayat Pesanan',
                         subtitle: 'Lihat semua pesanan Anda',
@@ -143,6 +168,7 @@ class ProfilePage extends StatelessWidget {
                       const SizedBox(height: 15),
 
                       _buildModernMenuItem(
+                        context,
                         icon: Icons.location_on_rounded,
                         title: 'Alamat Tersimpan',
                         subtitle: 'Kelola alamat pengiriman',
@@ -156,6 +182,7 @@ class ProfilePage extends StatelessWidget {
                       const SizedBox(height: 15),
 
                       _buildModernMenuItem(
+                        context,
                         icon: Icons.notifications_rounded,
                         title: 'Notifikasi',
                         subtitle: 'Pengaturan pemberitahuan',
@@ -169,6 +196,7 @@ class ProfilePage extends StatelessWidget {
                       const SizedBox(height: 15),
 
                       _buildModernMenuItem(
+                        context,
                         icon: Icons.help_rounded,
                         title: 'Bantuan',
                         subtitle: 'FAQ dan panduan penggunaan',
@@ -182,6 +210,7 @@ class ProfilePage extends StatelessWidget {
                       const SizedBox(height: 15),
 
                       _buildModernMenuItem(
+                        context,
                         icon: Icons.info_rounded,
                         title: 'Tentang Aplikasi',
                         subtitle: 'Informasi aplikasi',
@@ -190,6 +219,31 @@ class ProfilePage extends StatelessWidget {
                         ),
                         onTap: () {
                           _showAboutDialog(context);
+                        },
+                      ),
+                      const SizedBox(height: 15),
+
+                      // Theme Settings Menu Item
+                      _buildModernMenuItem(
+                        context,
+                        icon: Icons.color_lens_rounded,
+                        title: 'Pengaturan Tema',
+                        subtitle: isDarkMode
+                            ? 'Mode Gelap Aktif'
+                            : 'Mode Terang Aktif',
+                        gradient: LinearGradient(
+                          colors: isDarkMode
+                              ? [
+                                  const Color(0xFFffd700),
+                                  const Color(0xFFffa500),
+                                ]
+                              : [
+                                  const Color(0xFF3498db),
+                                  const Color(0xFF2980b9),
+                                ],
+                        ),
+                        onTap: () {
+                          _showThemeDialog(context);
                         },
                       ),
                       const SizedBox(height: 30),
@@ -221,30 +275,35 @@ class ProfilePage extends StatelessWidget {
                                   ),
                                 ),
                                 const SizedBox(width: 15),
-                                const Text(
+                                Text(
                                   'Hubungi Kami',
                                   style: TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.white,
+                                    color: isDarkMode
+                                        ? Colors.white
+                                        : Colors.black87,
                                   ),
                                 ),
                               ],
                             ),
                             const SizedBox(height: 20),
                             _buildContactRow(
+                              context,
                               Icons.phone_rounded,
                               'WhatsApp',
                               '+62 812-3456-7890',
                             ),
                             const SizedBox(height: 12),
                             _buildContactRow(
+                              context,
                               Icons.schedule_rounded,
                               'Jam Operasional',
                               '08:00 - 20:00 WIB',
                             ),
                             const SizedBox(height: 12),
                             _buildContactRow(
+                              context,
                               Icons.email_rounded,
                               'Email',
                               'info@kuriratapange.com',
@@ -313,13 +372,16 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  Widget _buildModernMenuItem({
+  Widget _buildModernMenuItem(
+    BuildContext context, {
     required IconData icon,
     required String title,
     required String subtitle,
     required Gradient gradient,
     required VoidCallback onTap,
   }) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return GestureDetector(
       onTap: onTap,
       child: GlassContainer(
@@ -350,10 +412,10 @@ class ProfilePage extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: isDarkMode ? Colors.white : Colors.black87,
                     ),
                   ),
                   const SizedBox(height: 5),
@@ -361,7 +423,9 @@ class ProfilePage extends StatelessWidget {
                     subtitle,
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.white.withAlpha(179),
+                      color: isDarkMode
+                          ? Colors.white.withAlpha(179)
+                          : Colors.black87.withAlpha(179),
                     ),
                   ),
                 ],
@@ -370,12 +434,14 @@ class ProfilePage extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.white.withAlpha(26),
+                color: isDarkMode
+                    ? Colors.white.withAlpha(26)
+                    : Colors.black.withAlpha(10),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.arrow_forward_ios_rounded,
-                color: Colors.white,
+                color: isDarkMode ? Colors.white : Colors.black87,
                 size: 16,
               ),
             ),
@@ -385,7 +451,14 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  Widget _buildContactRow(IconData icon, String label, String value) {
+  Widget _buildContactRow(
+    BuildContext context,
+    IconData icon,
+    String label,
+    String value,
+  ) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Row(
       children: [
         Container(
@@ -405,15 +478,17 @@ class ProfilePage extends StatelessWidget {
                 label,
                 style: TextStyle(
                   fontSize: 14,
-                  color: Colors.white.withAlpha(179),
+                  color: isDarkMode
+                      ? Colors.white.withAlpha(179)
+                      : Colors.black87.withAlpha(179),
                 ),
               ),
               Text(
                 value,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Colors.white,
+                  color: isDarkMode ? Colors.white : Colors.black87,
                 ),
               ),
             ],
@@ -424,6 +499,8 @@ class ProfilePage extends StatelessWidget {
   }
 
   void _showFeatureDialog(BuildContext context, String feature) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     showDialog(
       context: context,
       builder: (context) => BackdropFilter(
@@ -452,18 +529,18 @@ class ProfilePage extends StatelessWidget {
                 const SizedBox(height: 20),
                 Text(
                   feature,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: isDarkMode ? Colors.white : Colors.black87,
                   ),
                 ),
                 const SizedBox(height: 15),
-                const Text(
+                Text(
                   'Fitur ini sedang dalam pengembangan dan akan segera tersedia dalam update mendatang.',
                   style: TextStyle(
                     fontSize: 16,
-                    color: Colors.white,
+                    color: isDarkMode ? Colors.white : Colors.black87,
                     height: 1.4,
                   ),
                   textAlign: TextAlign.center,
@@ -505,7 +582,270 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
+  void _showThemeDialog(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    showDialog(
+      context: context,
+      builder: (context) => BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Dialog(
+          backgroundColor: Colors.transparent,
+          child: GlassContainer(
+            padding: const EdgeInsets.all(30),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: isDarkMode
+                          ? [const Color(0xFFffd700), const Color(0xFFffa500)]
+                          : [const Color(0xFF3498db), const Color(0xFF2980b9)],
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Icon(
+                    isDarkMode ? Icons.light_mode : Icons.dark_mode,
+                    color: Colors.white,
+                    size: 40,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  'Pengaturan Tema',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: isDarkMode ? Colors.white : Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 15),
+                Text(
+                  'Pilih tema yang sesuai dengan preferensi Anda',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: isDarkMode ? Colors.white : Colors.black87,
+                    height: 1.4,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 25),
+
+                // Light Theme Option
+                GestureDetector(
+                  onTap: () {
+                    themeNotifier.value = ThemeMode.light;
+                    Navigator.of(context).pop();
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(15),
+                    margin: const EdgeInsets.only(bottom: 15),
+                    decoration: BoxDecoration(
+                      color: !isDarkMode
+                          ? const Color(0xFF3498db).withOpacity(0.2)
+                          : Colors.white.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: !isDarkMode
+                            ? const Color(0xFF3498db)
+                            : Colors.transparent,
+                        width: 2,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 5,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.light_mode,
+                            color: Color(0xFF3498db),
+                            size: 24,
+                          ),
+                        ),
+                        const SizedBox(width: 15),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Mode Terang',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: isDarkMode
+                                      ? Colors.white
+                                      : Colors.black87,
+                                ),
+                              ),
+                              Text(
+                                'Tampilan cerah untuk siang hari',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: isDarkMode
+                                      ? Colors.white.withOpacity(0.7)
+                                      : Colors.black87.withOpacity(0.7),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        if (!isDarkMode)
+                          Container(
+                            padding: const EdgeInsets.all(5),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF3498db),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.check,
+                              color: Colors.white,
+                              size: 16,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                // Dark Theme Option
+                GestureDetector(
+                  onTap: () {
+                    themeNotifier.value = ThemeMode.dark;
+                    Navigator.of(context).pop();
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(15),
+                    decoration: BoxDecoration(
+                      color: isDarkMode
+                          ? const Color(0xFFffd700).withOpacity(0.2)
+                          : Colors.black.withOpacity(0.05),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: isDarkMode
+                            ? const Color(0xFFffd700)
+                            : Colors.transparent,
+                        width: 2,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF1D1E33),
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.2),
+                                blurRadius: 5,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.dark_mode,
+                            color: Color(0xFFffd700),
+                            size: 24,
+                          ),
+                        ),
+                        const SizedBox(width: 15),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Mode Gelap',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: isDarkMode
+                                      ? Colors.white
+                                      : Colors.black87,
+                                ),
+                              ),
+                              Text(
+                                'Tampilan gelap untuk malam hari',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: isDarkMode
+                                      ? Colors.white.withOpacity(0.7)
+                                      : Colors.black87.withOpacity(0.7),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        if (isDarkMode)
+                          Container(
+                            padding: const EdgeInsets.all(5),
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFffd700),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.check,
+                              color: Colors.white,
+                              size: 16,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 25),
+                Container(
+                  width: double.infinity,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF667eea), Color(0xFF764ba2)],
+                    ),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      shadowColor: Colors.transparent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ),
+                    child: const Text(
+                      'Tutup',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   void _showHelpDialog(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     showDialog(
       context: context,
       builder: (context) => BackdropFilter(
@@ -532,12 +872,12 @@ class ProfilePage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Text(
+                Text(
                   'Bantuan & FAQ',
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: isDarkMode ? Colors.white : Colors.black87,
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -547,15 +887,19 @@ class ProfilePage extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildHelpSection('🚀 Cara Menggunakan Aplikasi:', [
-                          '1. Pilih "Pesan Kurir" di beranda',
-                          '2. Isi form dengan lengkap dan benar',
-                          '3. Tunggu konfirmasi dari kurir via WhatsApp',
-                          '4. Lacak pesanan secara real-time',
-                          '5. Bayar cash saat barang sampai tujuan',
-                        ]),
+                        _buildHelpSection(
+                          context,
+                          '🚀 Cara Menggunakan Aplikasi:',
+                          [
+                            '1. Pilih "Pesan Kurir" di beranda',
+                            '2. Isi form dengan lengkap dan benar',
+                            '3. Tunggu konfirmasi dari kurir via WhatsApp',
+                            '4. Lacak pesanan secara real-time',
+                            '5. Bayar cash saat barang sampai tujuan',
+                          ],
+                        ),
                         const SizedBox(height: 20),
-                        _buildHelpSection('❓ Frequently Asked Questions:', [
+                        _buildHelpSection(context, '❓ Frequently Asked Questions:', [
                           'Q: Berapa lama waktu pengiriman?\nA: 15-30 menit untuk dalam desa',
                           'Q: Bagaimana cara pembayaran?\nA: Cash saat barang sampai di tujuan',
                           'Q: Bisa antar ke luar desa?\nA: Bisa, dengan tarif Rp 5.000',
@@ -603,6 +947,8 @@ class ProfilePage extends StatelessWidget {
   }
 
   void _showAboutDialog(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     showDialog(
       context: context,
       builder: (context) => BackdropFilter(
@@ -629,12 +975,12 @@ class ProfilePage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Text(
+                Text(
                   'Tentang Kurir Desa',
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: isDarkMode ? Colors.white : Colors.black87,
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -644,12 +990,12 @@ class ProfilePage extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           '🛵 Kurir Atapange v1.0.0',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: isDarkMode ? Colors.white : Colors.black87,
                           ),
                         ),
                         const SizedBox(height: 15),
@@ -657,12 +1003,14 @@ class ProfilePage extends StatelessWidget {
                           'Aplikasi ini dibuat untuk membantu warga Atapange dalam pengiriman barang dari toko ke rumah, terutama untuk pembelian melalui grup WhatsApp.',
                           style: TextStyle(
                             fontSize: 16,
-                            color: Colors.white.withAlpha(204),
+                            color: isDarkMode
+                                ? Colors.white.withAlpha(204)
+                                : Colors.black87.withAlpha(204),
                             height: 1.4,
                           ),
                         ),
                         const SizedBox(height: 20),
-                        _buildAboutSection('✨ Fitur Utama:', [
+                        _buildAboutSection(context, '✨ Fitur Utama:', [
                           '• Pemesanan kurir online yang mudah',
                           '• Tracking real-time dengan peta',
                           '• Pembayaran cash on delivery',
@@ -671,7 +1019,7 @@ class ProfilePage extends StatelessWidget {
                           '• Interface modern dan user-friendly',
                         ]),
                         const SizedBox(height: 20),
-                        _buildAboutSection('🎯 Misi Kami:', [
+                        _buildAboutSection(context, '🎯 Misi Kami:', [
                           '• Memudahkan akses pengiriman di desa',
                           '• Mendukung ekonomi lokal',
                           '• Menghubungkan warga dengan teknologi',
@@ -739,16 +1087,22 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  Widget _buildHelpSection(String title, List<String> items) {
+  Widget _buildHelpSection(
+    BuildContext context,
+    String title,
+    List<String> items,
+  ) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: isDarkMode ? Colors.white : Colors.black87,
           ),
         ),
         const SizedBox(height: 10),
@@ -759,7 +1113,9 @@ class ProfilePage extends StatelessWidget {
               item,
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.white.withAlpha(204),
+                color: isDarkMode
+                    ? Colors.white.withAlpha(204)
+                    : Colors.black87.withAlpha(204),
                 height: 1.3,
               ),
             ),
@@ -769,16 +1125,22 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  Widget _buildAboutSection(String title, List<String> items) {
+  Widget _buildAboutSection(
+    BuildContext context,
+    String title,
+    List<String> items,
+  ) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: isDarkMode ? Colors.white : Colors.black87,
           ),
         ),
         const SizedBox(height: 10),
@@ -789,7 +1151,9 @@ class ProfilePage extends StatelessWidget {
               item,
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.white.withAlpha(204),
+                color: isDarkMode
+                    ? Colors.white.withAlpha(204)
+                    : Colors.black87.withAlpha(204),
                 height: 1.3,
               ),
             ),

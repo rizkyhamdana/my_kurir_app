@@ -16,7 +16,8 @@ class TrackingPage extends StatefulWidget {
 
 class _TrackingPageState extends State<TrackingPage> {
   InAppWebViewController? webViewController;
-  final String url = "http://localhost:3000";
+  final String url =
+      "http://localhost:3000"; // Ganti dengan URL tracking yang sesuai
   bool isLoading = true;
   String? errorMessage;
 
@@ -44,17 +45,31 @@ class _TrackingPageState extends State<TrackingPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final textColor =
+        Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white;
+
     if (widget.orderData == null) {
       return _buildDemoScreen();
     }
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFF0A0E21), Color(0xFF1D1E33), Color(0xFF0A0E21)],
+            colors: isDarkMode
+                ? [
+                    const Color(0xFF0A0E21),
+                    const Color(0xFF1D1E33),
+                    const Color(0xFF0A0E21),
+                  ]
+                : [
+                    const Color(0xFFE8F0FE),
+                    const Color(0xFFF8F9FB),
+                    const Color(0xFFE8F0FE),
+                  ],
           ),
         ),
         child: SafeArea(
@@ -71,22 +86,18 @@ class _TrackingPageState extends State<TrackingPage> {
                         width: 50,
                         height: 50,
                         padding: const EdgeInsets.all(12),
-                        child: const Icon(
+                        child: Icon(
                           Icons.arrow_back_rounded,
-                          color: Colors.white,
+                          color: textColor,
                           size: 24,
                         ),
                       ),
                     ),
                     const SizedBox(width: 20),
-                    const Expanded(
+                    Expanded(
                       child: Text(
                         'Lacak Kurir Atapange',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
+                        style: Theme.of(context).textTheme.headlineMedium,
                       ),
                     ),
                     GestureDetector(
@@ -95,9 +106,9 @@ class _TrackingPageState extends State<TrackingPage> {
                         width: 50,
                         height: 50,
                         padding: const EdgeInsets.all(12),
-                        child: const Icon(
+                        child: Icon(
                           Icons.refresh_rounded,
-                          color: Colors.white,
+                          color: textColor,
                           size: 24,
                         ),
                       ),
@@ -182,7 +193,7 @@ class _TrackingPageState extends State<TrackingPage> {
                               'Pantau posisi kurir desa Anda secara real-time',
                               style: TextStyle(
                                 fontSize: 16,
-                                color: Colors.white.withAlpha(179),
+                                color: textColor.withAlpha(150),
                               ),
                               textAlign: TextAlign.center,
                             ),
@@ -266,7 +277,9 @@ class _TrackingPageState extends State<TrackingPage> {
                               if (isLoading && errorMessage == null)
                                 Container(
                                   decoration: BoxDecoration(
-                                    color: Colors.black.withAlpha(77),
+                                    color: isDarkMode
+                                        ? Colors.black.withAlpha(77)
+                                        : Colors.black.withAlpha(20),
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: const Center(
@@ -302,12 +315,12 @@ class _TrackingPageState extends State<TrackingPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
+                            Text(
                               '👨‍🚚 Informasi Kurir',
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                                color: textColor,
                               ),
                             ),
                             const SizedBox(height: 20),
@@ -337,12 +350,12 @@ class _TrackingPageState extends State<TrackingPage> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      const Text(
+                                      Text(
                                         'Ahmad Kurniawan',
                                         style: TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold,
-                                          color: Colors.white,
+                                          color: textColor,
                                         ),
                                       ),
                                       const SizedBox(height: 5),
@@ -350,7 +363,7 @@ class _TrackingPageState extends State<TrackingPage> {
                                         '+62 812-9876-5432',
                                         style: TextStyle(
                                           fontSize: 16,
-                                          color: Colors.white.withAlpha(179),
+                                          color: textColor.withAlpha(150),
                                         ),
                                       ),
                                       const SizedBox(height: 5),
@@ -430,12 +443,12 @@ class _TrackingPageState extends State<TrackingPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
+                            Text(
                               '📦 Detail Pesanan',
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                                color: textColor,
                               ),
                             ),
                             const SizedBox(height: 20),
@@ -481,12 +494,12 @@ class _TrackingPageState extends State<TrackingPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
+                            Text(
                               '📍 Timeline Pengiriman',
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                                color: textColor,
                               ),
                             ),
                             const SizedBox(height: 25),
@@ -548,12 +561,12 @@ class _TrackingPageState extends State<TrackingPage> {
                                   ),
                                 ),
                                 const SizedBox(width: 15),
-                                const Text(
+                                Text(
                                   'Info Pembayaran',
                                   style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.white,
+                                    color: textColor,
                                   ),
                                 ),
                               ],
@@ -624,13 +637,27 @@ class _TrackingPageState extends State<TrackingPage> {
   }
 
   Widget _buildDemoScreen() {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final textColor =
+        Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white;
+
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFF0A0E21), Color(0xFF1D1E33), Color(0xFF0A0E21)],
+            colors: isDarkMode
+                ? [
+                    const Color(0xFF0A0E21),
+                    const Color(0xFF1D1E33),
+                    const Color(0xFF0A0E21),
+                  ]
+                : [
+                    const Color(0xFFE8F0FE),
+                    const Color(0xFFF8F9FB),
+                    const Color(0xFFE8F0FE),
+                  ],
           ),
         ),
         child: SafeArea(
@@ -647,22 +674,18 @@ class _TrackingPageState extends State<TrackingPage> {
                         width: 50,
                         height: 50,
                         padding: const EdgeInsets.all(12),
-                        child: const Icon(
+                        child: Icon(
                           Icons.arrow_back_rounded,
-                          color: Colors.white,
+                          color: textColor,
                           size: 24,
                         ),
                       ),
                     ),
                     const SizedBox(width: 20),
-                    const Expanded(
+                    Expanded(
                       child: Text(
                         'Lacak Pesanan',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
+                        style: Theme.of(context).textTheme.headlineMedium,
                       ),
                     ),
                   ],
@@ -691,12 +714,12 @@ class _TrackingPageState extends State<TrackingPage> {
                             ),
                           ),
                           const SizedBox(height: 30),
-                          const Text(
+                          Text(
                             '🚀 Demo Mode',
                             style: TextStyle(
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: isDarkMode ? Colors.white : Colors.black87,
                             ),
                           ),
                           const SizedBox(height: 15),
@@ -704,7 +727,7 @@ class _TrackingPageState extends State<TrackingPage> {
                             'Menampilkan contoh tracking pesanan dengan data dummy untuk demo aplikasi',
                             style: TextStyle(
                               fontSize: 16,
-                              color: Colors.white.withAlpha(179),
+                              color: textColor.withAlpha(150),
                               height: 1.5,
                             ),
                             textAlign: TextAlign.center,
@@ -760,7 +783,9 @@ class _TrackingPageState extends State<TrackingPage> {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(18),
                               border: Border.all(
-                                color: const Color(0xFF667eea),
+                                color: isDarkMode
+                                    ? const Color(0xFF667eea)
+                                    : const Color(0xFF4A80F0),
                                 width: 2,
                               ),
                             ),
@@ -774,20 +799,24 @@ class _TrackingPageState extends State<TrackingPage> {
                                   borderRadius: BorderRadius.circular(18),
                                 ),
                               ),
-                              child: const Row(
+                              child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Icon(
                                     Icons.add_rounded,
-                                    color: Color(0xFF667eea),
+                                    color: isDarkMode
+                                        ? const Color(0xFF667eea)
+                                        : const Color(0xFF4A80F0),
                                   ),
-                                  SizedBox(width: 12),
+                                  const SizedBox(width: 12),
                                   Text(
                                     'Pesan Kurir Baru',
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
-                                      color: Color(0xFF667eea),
+                                      color: isDarkMode
+                                          ? const Color(0xFF667eea)
+                                          : const Color(0xFF4A80F0),
                                     ),
                                   ),
                                 ],
@@ -808,9 +837,15 @@ class _TrackingPageState extends State<TrackingPage> {
   }
 
   Widget _buildErrorState() {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final textColor =
+        Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white;
+
     return Container(
       decoration: BoxDecoration(
-        color: Colors.black.withAlpha(77),
+        color: isDarkMode
+            ? Colors.black.withAlpha(77)
+            : Colors.black.withAlpha(20),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Center(
@@ -830,21 +865,18 @@ class _TrackingPageState extends State<TrackingPage> {
               ),
             ),
             const SizedBox(height: 20),
-            const Text(
+            Text(
               'Gagal memuat peta',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: textColor,
               ),
             ),
             const SizedBox(height: 10),
             Text(
               errorMessage ?? 'Terjadi kesalahan',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.white.withAlpha(179),
-              ),
+              style: TextStyle(fontSize: 14, color: textColor.withAlpha(150)),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),
@@ -932,6 +964,10 @@ class _TrackingPageState extends State<TrackingPage> {
     String value, {
     Color? valueColor,
   }) {
+    // final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final textColor =
+        Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 15),
       child: Row(
@@ -947,7 +983,7 @@ class _TrackingPageState extends State<TrackingPage> {
                   label,
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.white.withAlpha(153),
+                    color: textColor.withAlpha(140),
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -956,7 +992,7 @@ class _TrackingPageState extends State<TrackingPage> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: valueColor ?? Colors.white,
+                    color: valueColor ?? textColor,
                   ),
                 ),
               ],
@@ -973,6 +1009,10 @@ class _TrackingPageState extends State<TrackingPage> {
     bool isCompleted, {
     bool isLast = false,
   }) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final textColor =
+        Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white;
+
     return Row(
       children: [
         Column(
@@ -984,11 +1024,15 @@ class _TrackingPageState extends State<TrackingPage> {
                 shape: BoxShape.circle,
                 color: isCompleted
                     ? const Color(0xFF43e97b)
-                    : Colors.white.withAlpha(77),
+                    : (isDarkMode
+                          ? Colors.white.withAlpha(77)
+                          : Colors.black.withAlpha(77)),
                 border: Border.all(
                   color: isCompleted
                       ? const Color(0xFF43e97b)
-                      : Colors.white.withAlpha(77),
+                      : (isDarkMode
+                            ? Colors.white.withAlpha(77)
+                            : Colors.black.withAlpha(77)),
                   width: 2,
                 ),
               ),
@@ -1002,7 +1046,9 @@ class _TrackingPageState extends State<TrackingPage> {
                 height: 30,
                 color: isCompleted
                     ? const Color(0xFF43e97b)
-                    : Colors.white.withAlpha(51),
+                    : (isDarkMode
+                          ? Colors.white.withAlpha(51)
+                          : Colors.black.withAlpha(51)),
               ),
           ],
         ),
@@ -1017,9 +1063,7 @@ class _TrackingPageState extends State<TrackingPage> {
                   title,
                   style: TextStyle(
                     fontSize: 16,
-                    color: isCompleted
-                        ? Colors.white
-                        : Colors.white.withAlpha(153),
+                    color: isCompleted ? textColor : textColor.withAlpha(150),
                     fontWeight: isCompleted
                         ? FontWeight.w600
                         : FontWeight.normal,
@@ -1029,7 +1073,7 @@ class _TrackingPageState extends State<TrackingPage> {
                   time,
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.white.withAlpha(130),
+                    color: textColor.withAlpha(150),
                   ),
                 ),
               ],
@@ -1046,6 +1090,10 @@ class _TrackingPageState extends State<TrackingPage> {
     String value, {
     Color? statusColor,
   }) {
+    // final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final textColor =
+        Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
@@ -1055,10 +1103,7 @@ class _TrackingPageState extends State<TrackingPage> {
           Expanded(
             child: Text(
               label,
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.white.withAlpha(204),
-              ),
+              style: TextStyle(fontSize: 16, color: textColor.withAlpha(140)),
             ),
           ),
           Text(
@@ -1083,6 +1128,10 @@ class _TrackingPageState extends State<TrackingPage> {
   }
 
   void _callKurir() {
+    // final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final textColor =
+        Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white;
+
     showDialog(
       context: context,
       builder: (context) => BackdropFilter(
@@ -1109,18 +1158,18 @@ class _TrackingPageState extends State<TrackingPage> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Text(
+                Text(
                   'Hubungi Kurir',
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: textColor,
                   ),
                 ),
                 const SizedBox(height: 15),
-                const Text(
+                Text(
                   'Ahmad Kurniawan\n+62 812-9876-5432',
-                  style: TextStyle(fontSize: 16, color: Colors.white),
+                  style: TextStyle(fontSize: 16, color: textColor),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 25),
@@ -1174,6 +1223,10 @@ class _TrackingPageState extends State<TrackingPage> {
   }
 
   void _chatKurir() {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final textColor =
+        Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white;
+
     showDialog(
       context: context,
       builder: (context) => BackdropFilter(
@@ -1200,18 +1253,18 @@ class _TrackingPageState extends State<TrackingPage> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Text(
+                Text(
                   'Chat WhatsApp',
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: textColor,
                   ),
                 ),
                 const SizedBox(height: 15),
-                const Text(
+                Text(
                   'Akan membuka chat WhatsApp dengan kurir:',
-                  style: TextStyle(fontSize: 16, color: Colors.white),
+                  style: TextStyle(fontSize: 16, color: textColor),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 20),
@@ -1221,25 +1274,25 @@ class _TrackingPageState extends State<TrackingPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Ahmad Kurniawan',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: textColor,
                           fontSize: 16,
                         ),
                       ),
                       const SizedBox(height: 5),
-                      const Text(
+                      Text(
                         '+62 812-9876-5432',
-                        style: TextStyle(color: Colors.white, fontSize: 14),
+                        style: TextStyle(color: textColor, fontSize: 14),
                       ),
                       const SizedBox(height: 15),
                       Text(
                         'Pesan otomatis: "Halo Pak Ahmad, saya ${currentOrder.nama}. Bagaimana status pengiriman pesanan saya?"',
                         style: TextStyle(
                           fontSize: 12,
-                          color: Colors.white.withAlpha(179),
+                          color: textColor.withAlpha(150),
                           fontStyle: FontStyle.italic,
                         ),
                       ),
@@ -1254,7 +1307,11 @@ class _TrackingPageState extends State<TrackingPage> {
                         height: 50,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(15),
-                          border: Border.all(color: Colors.white.withAlpha(77)),
+                          border: Border.all(
+                            color: isDarkMode
+                                ? Colors.white.withAlpha(77)
+                                : Colors.black.withAlpha(77),
+                          ),
                         ),
                         child: ElevatedButton(
                           onPressed: () => Navigator.of(context).pop(),
@@ -1265,10 +1322,10 @@ class _TrackingPageState extends State<TrackingPage> {
                               borderRadius: BorderRadius.circular(15),
                             ),
                           ),
-                          child: const Text(
+                          child: Text(
                             'Batal',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: textColor,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -1305,6 +1362,10 @@ class _TrackingPageState extends State<TrackingPage> {
   }
 
   void _showOrderDetails() {
+    // final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final textColor =
+        Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white;
+
     showDialog(
       context: context,
       builder: (context) => BackdropFilter(
@@ -1331,12 +1392,12 @@ class _TrackingPageState extends State<TrackingPage> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Text(
+                Text(
                   'Detail Pesanan',
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: textColor,
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -1423,6 +1484,10 @@ class _TrackingPageState extends State<TrackingPage> {
   }
 
   Widget _buildOrderDetailRow(String label, String value) {
+    // final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final textColor =
+        Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 15),
       child: Row(
@@ -1434,7 +1499,7 @@ class _TrackingPageState extends State<TrackingPage> {
               '$label:',
               style: TextStyle(
                 fontWeight: FontWeight.w600,
-                color: Colors.white.withAlpha(204),
+                color: textColor.withAlpha(150),
                 fontSize: 14,
               ),
             ),
@@ -1442,7 +1507,7 @@ class _TrackingPageState extends State<TrackingPage> {
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(color: Colors.white, fontSize: 14),
+              style: TextStyle(color: textColor, fontSize: 14),
             ),
           ),
         ],

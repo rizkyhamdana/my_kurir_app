@@ -43,13 +43,17 @@ class _SplashScreenPageState extends State<SplashScreenPage>
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFF667eea), Color(0xFF764ba2)],
+            colors: isDarkMode
+                ? [const Color(0xFF667eea), const Color(0xFF764ba2)]
+                : [const Color(0xFF4A80F0), const Color(0xFF7B68EE)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -62,7 +66,6 @@ class _SplashScreenPageState extends State<SplashScreenPage>
                 opacity: _fadeAnimation,
                 child: GlassContainer(
                   width: MediaQuery.of(context).size.width * 0.85,
-
                   blur: 24,
                   borderRadius: BorderRadius.circular(36),
                   padding: const EdgeInsets.symmetric(
@@ -114,7 +117,7 @@ class _SplashScreenPageState extends State<SplashScreenPage>
                             Shadow(
                               color: Colors.black.withAlpha(50),
                               blurRadius: 10,
-                              offset: Offset(0, 2),
+                              offset: const Offset(0, 2),
                             ),
                           ],
                         ),
@@ -133,7 +136,7 @@ class _SplashScreenPageState extends State<SplashScreenPage>
                       const SizedBox(height: 28),
                       CircularProgressIndicator(
                         valueColor: AlwaysStoppedAnimation<Color>(
-                          Color(0xFF667eea),
+                          isDarkMode ? const Color(0xFF667eea) : Colors.white,
                         ),
                         backgroundColor: Colors.white.withAlpha(50),
                         strokeWidth: 3,

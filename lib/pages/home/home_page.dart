@@ -42,13 +42,28 @@ class _HomePageState extends State<HomePage>
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final textColor =
+        Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white;
+    final textColorFaded = textColor.withOpacity(0.7);
+
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFF0A0E21), Color(0xFF1D1E33), Color(0xFF0A0E21)],
+            colors: isDarkMode
+                ? [
+                    const Color(0xFF0A0E21),
+                    const Color(0xFF1D1E33),
+                    const Color(0xFF0A0E21),
+                  ]
+                : [
+                    const Color(0xFFE8F0FE),
+                    const Color(0xFFF8F9FB),
+                    const Color(0xFFE8F0FE),
+                  ],
           ),
         ),
         child: SafeArea(
@@ -72,16 +87,14 @@ class _HomePageState extends State<HomePage>
                                   'Selamat Datang di Aplikasi',
                                   style: TextStyle(
                                     fontSize: 16,
-                                    color: Colors.white.withAlpha(179),
+                                    color: textColorFaded,
                                   ),
                                 ),
-                                const Text(
+                                Text(
                                   'Kurir Atapange',
-                                  style: TextStyle(
-                                    fontSize: 32,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.headlineLarge,
                                 ),
                               ],
                             ),
@@ -91,9 +104,9 @@ class _HomePageState extends State<HomePage>
                                 width: 50,
                                 height: 50,
                                 padding: const EdgeInsets.all(12),
-                                child: const Icon(
+                                child: Icon(
                                   Icons.person,
-                                  color: Colors.white,
+                                  color: textColor,
                                   size: 24,
                                 ),
                               ),
@@ -133,21 +146,18 @@ class _HomePageState extends State<HomePage>
                                 ),
                               ),
                               const SizedBox(height: 20),
-                              const Text(
+                              Text(
                                 'Solusi Pengiriman\nuntuk Desa',
-                                style: TextStyle(
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                  height: 1.2,
-                                ),
+                                style: Theme.of(
+                                  context,
+                                ).textTheme.headlineLarge,
                               ),
                               const SizedBox(height: 12),
                               Text(
                                 'Kirim barang dengan mudah, cepat, dan terpercaya langsung ke rumah Anda',
                                 style: TextStyle(
                                   fontSize: 16,
-                                  color: Colors.white.withAlpha(179),
+                                  color: textColorFaded,
                                   height: 1.5,
                                 ),
                               ),
@@ -157,13 +167,9 @@ class _HomePageState extends State<HomePage>
                         const SizedBox(height: 30),
 
                         // Quick Actions
-                        const Text(
+                        Text(
                           'Layanan Kami',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
+                          style: Theme.of(context).textTheme.headlineLarge,
                         ),
                         const SizedBox(height: 20),
 
@@ -171,7 +177,6 @@ class _HomePageState extends State<HomePage>
                           children: [
                             Expanded(
                               child: _buildModernServiceCard(
-                                context,
                                 icon: Icons.add_shopping_cart_rounded,
                                 title: 'Pesan Kurir',
                                 subtitle: 'Antar barang dari toko',
@@ -187,7 +192,6 @@ class _HomePageState extends State<HomePage>
                             const SizedBox(width: 15),
                             Expanded(
                               child: _buildModernServiceCard(
-                                context,
                                 icon: Icons.track_changes_rounded,
                                 title: 'Lacak Pesanan',
                                 subtitle: 'Pantau real-time',
@@ -205,13 +209,9 @@ class _HomePageState extends State<HomePage>
                         const SizedBox(height: 30),
 
                         // Info Cards
-                        const Text(
+                        Text(
                           'Informasi Layanan',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
+                          style: Theme.of(context).textTheme.headlineLarge,
                         ),
                         const SizedBox(height: 20),
 
@@ -249,8 +249,7 @@ class _HomePageState extends State<HomePage>
     );
   }
 
-  Widget _buildModernServiceCard(
-    BuildContext context, {
+  Widget _buildModernServiceCard({
     required IconData icon,
     required String title,
     required String subtitle,
@@ -326,6 +325,10 @@ class _HomePageState extends State<HomePage>
     required String content,
     required Color color,
   }) {
+    final textColor =
+        Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white;
+    final textColorFaded = textColor.withOpacity(0.7);
+
     return GlassContainer(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -347,10 +350,10 @@ class _HomePageState extends State<HomePage>
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: textColor,
                   ),
                 ),
                 const SizedBox(height: 5),
@@ -358,7 +361,7 @@ class _HomePageState extends State<HomePage>
                   content,
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.white.withAlpha(179),
+                    color: textColorFaded,
                     height: 1.4,
                   ),
                 ),

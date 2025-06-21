@@ -32,13 +32,28 @@ class _OrderPageState extends State<OrderPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final textColor =
+        Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white;
+    final textColorFaded = textColor.withAlpha(150);
+
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFF0A0E21), Color(0xFF1D1E33), Color(0xFF0A0E21)],
+            colors: isDarkMode
+                ? [
+                    const Color(0xFF0A0E21),
+                    const Color(0xFF1D1E33),
+                    const Color(0xFF0A0E21),
+                  ]
+                : [
+                    const Color(0xFFE8F0FE),
+                    const Color(0xFFF8F9FB),
+                    const Color(0xFFE8F0FE),
+                  ],
           ),
         ),
         child: SafeArea(
@@ -55,22 +70,18 @@ class _OrderPageState extends State<OrderPage> {
                         width: 50,
                         height: 50,
                         padding: const EdgeInsets.all(12),
-                        child: const Icon(
+                        child: Icon(
                           Icons.arrow_back_rounded,
-                          color: Colors.white,
+                          color: textColor,
                           size: 24,
                         ),
                       ),
                     ),
                     const SizedBox(width: 20),
-                    const Expanded(
+                    Expanded(
                       child: Text(
                         'Pesan Kurir Atapange',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
+                        style: Theme.of(context).textTheme.headlineMedium,
                       ),
                     ),
                   ],
@@ -110,12 +121,12 @@ class _OrderPageState extends State<OrderPage> {
                                 ),
                               ),
                               const SizedBox(height: 20),
-                              const Text(
+                              Text(
                                 'Kurir Atapange Siap Membantu!',
                                 style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                                  color: textColor,
                                 ),
                                 textAlign: TextAlign.center,
                               ),
@@ -124,7 +135,7 @@ class _OrderPageState extends State<OrderPage> {
                                 'Pesan barang di grup WA? Kami antar sampai rumah dengan aman dan cepat',
                                 style: TextStyle(
                                   fontSize: 14,
-                                  color: Colors.white.withAlpha(179),
+                                  color: textColorFaded,
                                   height: 1.4,
                                 ),
                                 textAlign: TextAlign.center,
@@ -244,12 +255,12 @@ class _OrderPageState extends State<OrderPage> {
                                     ),
                                   ),
                                   const SizedBox(width: 12),
-                                  const Text(
+                                  Text(
                                     'Jenis Barang',
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w600,
-                                      color: Colors.white,
+                                      color: textColor,
                                     ),
                                   ),
                                 ],
@@ -260,18 +271,24 @@ class _OrderPageState extends State<OrderPage> {
                                   horizontal: 15,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withAlpha(26),
+                                  color: isDarkMode
+                                      ? Colors.white.withAlpha(26)
+                                      : Colors.black.withAlpha(10),
                                   borderRadius: BorderRadius.circular(15),
                                   border: Border.all(
-                                    color: Colors.white.withAlpha(51),
+                                    color: isDarkMode
+                                        ? Colors.white.withAlpha(51)
+                                        : Colors.black.withAlpha(20),
                                   ),
                                 ),
                                 child: DropdownButtonHideUnderline(
                                   child: DropdownButton<String>(
                                     value: _jenisBarang,
                                     isExpanded: true,
-                                    dropdownColor: const Color(0xFF1D1E33),
-                                    style: const TextStyle(color: Colors.white),
+                                    dropdownColor: isDarkMode
+                                        ? const Color(0xFF1D1E33)
+                                        : Colors.white,
+                                    style: TextStyle(color: textColor),
                                     items: const [
                                       DropdownMenuItem(
                                         value: 'Makanan/Minuman',
@@ -319,6 +336,8 @@ class _OrderPageState extends State<OrderPage> {
                           maxLines: 3,
                         ),
                         const SizedBox(height: 20),
+
+                        // Pilih Kurir Section
                         _buildSectionTitle('🚴‍♂️ Pilih Kurir'),
                         const SizedBox(height: 15),
                         GlassContainer(
@@ -342,8 +361,8 @@ class _OrderPageState extends State<OrderPage> {
                                         kurir['nama'],
                                         style: TextStyle(
                                           color: isOnline
-                                              ? Colors.white
-                                              : Colors.white54,
+                                              ? textColor
+                                              : textColor.withAlpha(100),
                                           fontWeight: FontWeight.w600,
                                         ),
                                       ),
@@ -376,18 +395,21 @@ class _OrderPageState extends State<OrderPage> {
                                     kurir['phone'],
                                     style: TextStyle(
                                       color: isOnline
-                                          ? Colors.white70
-                                          : Colors.white38,
+                                          ? textColor.withAlpha(150)
+                                          : textColor.withAlpha(100),
                                       fontSize: 13,
                                     ),
                                   ),
-                                  activeColor: const Color(0xFF667eea),
+                                  activeColor: isDarkMode
+                                      ? const Color(0xFF667eea)
+                                      : const Color(0xFF4A80F0),
                                 );
                               }),
                             ],
                           ),
                         ),
                         const SizedBox(height: 30),
+
                         // Urgent Checkbox
                         GlassContainer(
                           width: double.infinity,
@@ -411,7 +433,9 @@ class _OrderPageState extends State<OrderPage> {
                                     border: Border.all(
                                       color: _isUrgent
                                           ? const Color(0xFFf5576c)
-                                          : Colors.white.withAlpha(77),
+                                          : (isDarkMode
+                                                ? Colors.white.withAlpha(77)
+                                                : Colors.black.withAlpha(77)),
                                       width: 2,
                                     ),
                                   ),
@@ -429,19 +453,19 @@ class _OrderPageState extends State<OrderPage> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      const Text(
+                                      Text(
                                         '⚡ Pengiriman Urgent',
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w600,
-                                          color: Colors.white,
+                                          color: textColor,
                                         ),
                                       ),
                                       Text(
                                         'Tambahan biaya Rp 2.000 untuk prioritas',
                                         style: TextStyle(
                                           fontSize: 14,
-                                          color: Colors.white.withAlpha(179),
+                                          color: textColorFaded,
                                         ),
                                       ),
                                     ],
@@ -480,12 +504,12 @@ class _OrderPageState extends State<OrderPage> {
                                     ),
                                   ),
                                   const SizedBox(width: 15),
-                                  const Text(
+                                  Text(
                                     'Informasi Tarif',
                                     style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
-                                      color: Colors.white,
+                                      color: textColor,
                                     ),
                                   ),
                                 ],
@@ -569,12 +593,15 @@ class _OrderPageState extends State<OrderPage> {
   }
 
   Widget _buildSectionTitle(String title) {
+    final textColor =
+        Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white;
+
     return Text(
       title,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 20,
         fontWeight: FontWeight.bold,
-        color: Colors.white,
+        color: textColor,
       ),
     );
   }
@@ -587,8 +614,12 @@ class _OrderPageState extends State<OrderPage> {
     int maxLines = 1,
     TextInputType? keyboardType,
     String? Function(String?)? validator,
-    VoidCallback? onPickLocation, // Tambahkan parameter ini
+    VoidCallback? onPickLocation,
   }) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final textColor =
+        Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white;
+
     return GlassContainer(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -608,10 +639,10 @@ class _OrderPageState extends State<OrderPage> {
               const SizedBox(width: 12),
               Text(
                 label,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Colors.white,
+                  color: textColor,
                 ),
               ),
               if (onPickLocation != null) ...[
@@ -633,19 +664,29 @@ class _OrderPageState extends State<OrderPage> {
             maxLines: maxLines,
             keyboardType: keyboardType,
             validator: validator,
-            style: const TextStyle(color: Colors.white),
+            style: TextStyle(color: textColor),
             decoration: InputDecoration(
               hintText: hint,
-              hintStyle: TextStyle(color: Colors.white.withAlpha(130)),
+              hintStyle: TextStyle(color: textColor.withAlpha(150)),
               filled: true,
-              fillColor: Colors.white.withAlpha(26),
+              fillColor: isDarkMode
+                  ? Colors.white.withAlpha(26)
+                  : Colors.black.withAlpha(10),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(15),
-                borderSide: BorderSide(color: Colors.white.withAlpha(51)),
+                borderSide: BorderSide(
+                  color: isDarkMode
+                      ? Colors.white.withAlpha(51)
+                      : Colors.black.withAlpha(20),
+                ),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(15),
-                borderSide: BorderSide(color: Colors.white.withAlpha(51)),
+                borderSide: BorderSide(
+                  color: isDarkMode
+                      ? Colors.white.withAlpha(51)
+                      : Colors.black.withAlpha(20),
+                ),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(15),
@@ -661,6 +702,13 @@ class _OrderPageState extends State<OrderPage> {
                   width: 2,
                 ),
               ),
+              focusedErrorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(15),
+                borderSide: const BorderSide(
+                  color: Color(0xFFf5576c),
+                  width: 2,
+                ),
+              ),
               contentPadding: const EdgeInsets.all(15),
             ),
           ),
@@ -670,6 +718,10 @@ class _OrderPageState extends State<OrderPage> {
   }
 
   Widget _buildTariffRow(String emoji, String label, String price) {
+    // final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final textColor =
+        Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
@@ -679,10 +731,7 @@ class _OrderPageState extends State<OrderPage> {
           Expanded(
             child: Text(
               label,
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.white.withAlpha(204),
-              ),
+              style: TextStyle(fontSize: 16, color: textColor.withAlpha(150)),
             ),
           ),
           Text(
@@ -699,6 +748,10 @@ class _OrderPageState extends State<OrderPage> {
   }
 
   void _submitOrder() {
+    // final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final textColor =
+        Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white;
+
     final order = OrderModel(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       nama: _namaController.text,
@@ -737,12 +790,12 @@ class _OrderPageState extends State<OrderPage> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Text(
+                Text(
                   'Pesanan Berhasil!',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: textColor,
                   ),
                 ),
                 const SizedBox(height: 15),
@@ -750,7 +803,7 @@ class _OrderPageState extends State<OrderPage> {
                   'Pesanan Anda telah diterima. Kurir akan segera menghubungi Anda via WhatsApp untuk konfirmasi.',
                   style: TextStyle(
                     fontSize: 16,
-                    color: Colors.white.withAlpha(204),
+                    color: textColor.withAlpha(150),
                     height: 1.4,
                   ),
                   textAlign: TextAlign.center,
