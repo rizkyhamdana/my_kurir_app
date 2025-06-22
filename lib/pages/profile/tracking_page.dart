@@ -16,29 +16,75 @@ class TrackingPage extends StatefulWidget {
 
 class _TrackingPageState extends State<TrackingPage> {
   InAppWebViewController? webViewController;
-  final String url =
-      "http://localhost:3000"; // Ganti dengan URL tracking yang sesuai
+  final String url = "http://localhost:3000";
   bool isLoading = true;
   String? errorMessage;
 
   late OrderModel _dummyOrder;
+  final dummyOrderBisaDibatalkan = OrderModel(
+    id: 'ORDER-001',
+    nama: 'Budi Santoso',
+    phone: '+62 812-3456-7890',
+    alamatJemput: 'Warung Bu Siti, Jl. Raya Desa No. 15, RT 01/RW 02',
+    alamatAntar: 'Rumah Pak Budi, Jl. Melati No. 8, RT 03/RW 01, Dusun Krajan',
+    jenisBarang: 'Makanan/Minuman',
+    catatan: 'Sudah dibayar via transfer, tinggal ambil saja',
+    isUrgent: true,
+    createdAt: DateTime.now().subtract(const Duration(minutes: 10)),
+    confirmedAt: DateTime.now().subtract(const Duration(minutes: 8)),
+    pickingUpAt: DateTime.now().subtract(const Duration(minutes: 5)),
+    onTheWayAt: DateTime.now().subtract(const Duration(minutes: 2)),
+    deliveredAt: null,
+    status: OrderStatus.pickingUp,
+    kurirName: 'Ahmad Kurniawan',
+    kurirPhone: '+62 812-9876-5432',
+  );
+
+  final dummyOrderTidakAdaPesanan = OrderModel(
+    id: 'ORDER-002',
+    nama: 'Budi Santoso',
+    phone: '+62 812-3456-7890',
+    alamatJemput: 'Warung Bu Siti, Jl. Raya Desa No. 15, RT 01/RW 02',
+    alamatAntar: 'Rumah Pak Budi, Jl. Melati No. 8, RT 03/RW 01, Dusun Krajan',
+    jenisBarang: 'Makanan/Minuman',
+    catatan: '',
+    isUrgent: false,
+    createdAt: DateTime.now().subtract(const Duration(hours: 2)),
+    status:
+        OrderStatus.delivered, // <--- sudah selesai, tidak ada pesanan aktif
+    kurirName: 'Ahmad Kurniawan',
+    kurirPhone: '+62 812-9876-5432',
+  );
+
+  int _statusToIndex(OrderStatus status) {
+    switch (status) {
+      case OrderStatus.pending:
+        return 0;
+      case OrderStatus.confirmed:
+        return 1;
+      case OrderStatus.pickingUp:
+        return 2;
+      case OrderStatus.onTheWay:
+        return 3;
+      case OrderStatus.delivered:
+        return 4;
+      default:
+        return 0;
+    }
+  }
+
+  final timelineSteps = [
+    'Menunggu Konfirmasi',
+    'Dikonfirmasi',
+    'Kurir Mengambil Barang',
+    'Dalam Perjalanan',
+    'Terkirim',
+  ];
 
   @override
   void initState() {
     super.initState();
-    _dummyOrder = OrderModel(
-      id: 'ORDER-${DateTime.now().millisecondsSinceEpoch}',
-      nama: 'Budi Santoso',
-      phone: '+62 812-3456-7890',
-      alamatJemput: 'Warung Bu Siti, Jl. Raya Desa No. 15, RT 01/RW 02',
-      alamatAntar:
-          'Rumah Pak Budi, Jl. Melati No. 8, RT 03/RW 01, Dusun Krajan',
-      jenisBarang: 'Makanan/Minuman',
-      catatan: 'Sudah dibayar via transfer, tinggal ambil saja',
-      isUrgent: true,
-      createdAt: DateTime.now().subtract(const Duration(minutes: 45)),
-      status: OrderStatus.onTheWay,
-    );
+    _dummyOrder = dummyOrderBisaDibatalkan;
   }
 
   OrderModel get currentOrder => widget.orderData ?? _dummyOrder;
@@ -48,9 +94,128 @@ class _TrackingPageState extends State<TrackingPage> {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final textColor =
         Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white;
+    final currentStep = _statusToIndex(currentOrder.status);
+    final timelineTimes = [
+      currentOrder.createdAt,
+      currentOrder.confirmedAt,
+      currentOrder.pickingUpAt,
+      currentOrder.onTheWayAt,
+      currentOrder.deliveredAt,
+    ];
 
-    if (widget.orderData == null) {
-      return _buildDemoScreen();
+    // Jika order sudah selesai/dibatalkan, tampilkan pesan kosong
+    if (currentOrder.status == OrderStatus.delivered ||
+        currentOrder.status == OrderStatus.cancelled) {
+      final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+      final textColor =
+          Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white;
+
+      return Scaffold(
+        backgroundColor: isDarkMode
+            ? const Color(0xFF0A0E21)
+            : const Color(0xFFF8F9FB),
+        body: SafeArea(
+          child: Column(
+            children: [
+              // Custom App Bar (konsisten dengan halaman lain)
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () => context.pop(),
+                      child: GlassContainer(
+                        width: 50,
+                        height: 50,
+                        padding: const EdgeInsets.all(12),
+                        child: Icon(
+                          Icons.arrow_back_rounded,
+                          color: textColor,
+                          size: 24,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                    Expanded(
+                      child: Text(
+                        'Lacak Kurir Atapange',
+                        style: Theme.of(context).textTheme.headlineMedium,
+                      ),
+                    ),
+                    const SizedBox(width: 50), // Placeholder biar rata tengah
+                  ],
+                ),
+              ),
+              Expanded(
+                child: Center(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                    margin: EdgeInsets.only(bottom: 48),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.inbox_rounded,
+                          size: 90,
+                          color: Colors.grey.withOpacity(0.3),
+                        ),
+                        const SizedBox(height: 30),
+                        Text(
+                          'Tidak Ada Pesanan Aktif',
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: textColor,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'Kamu belum memiliki pesanan yang sedang berjalan.\nSilakan buat pesanan baru jika membutuhkan layanan kurir.',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: textColor.withAlpha(160),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 32),
+                        ElevatedButton.icon(
+                          icon: const Icon(
+                            Icons.add_shopping_cart_rounded,
+                            color: Colors.white,
+                          ),
+                          label: const Text(
+                            'Buat Pesanan Baru',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF667eea),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 16,
+                              horizontal: 24,
+                            ),
+                          ),
+                          onPressed: () {
+                            context.pushReplacement(
+                              '/order',
+                            ); // Ganti '/order' sesuai rute halaman order Anda
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
     }
 
     return Scaffold(
@@ -123,39 +288,6 @@ class _TrackingPageState extends State<TrackingPage> {
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
                     children: [
-                      // Demo Badge
-                      if (currentOrder.id.startsWith('ORDER-'))
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(15),
-                          margin: const EdgeInsets.only(bottom: 20),
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFFffeaa7), Color(0xFFfdcb6e)],
-                            ),
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          child: const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.science_rounded,
-                                color: Colors.white,
-                                size: 20,
-                              ),
-                              SizedBox(width: 10),
-                              Text(
-                                '🧪 Mode Demo - Data Contoh',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
                       // Status Header
                       GlassContainer(
                         width: double.infinity,
@@ -351,7 +483,7 @@ class _TrackingPageState extends State<TrackingPage> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        'Ahmad Kurniawan',
+                                        currentOrder.kurirName ?? '-',
                                         style: TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold,
@@ -360,38 +492,10 @@ class _TrackingPageState extends State<TrackingPage> {
                                       ),
                                       const SizedBox(height: 5),
                                       Text(
-                                        '+62 812-9876-5432',
+                                        currentOrder.kurirPhone ?? '-',
                                         style: TextStyle(
                                           fontSize: 16,
                                           color: textColor.withAlpha(150),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 5),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 10,
-                                          vertical: 4,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: const Color(
-                                            0xFF43e97b,
-                                          ).withAlpha(51),
-                                          borderRadius: BorderRadius.circular(
-                                            10,
-                                          ),
-                                          border: Border.all(
-                                            color: const Color(
-                                              0xFF43e97b,
-                                            ).withAlpha(77),
-                                          ),
-                                        ),
-                                        child: const Text(
-                                          '⭐ Rating 4.9',
-                                          style: TextStyle(
-                                            color: Color(0xFF43e97b),
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w600,
-                                          ),
                                         ),
                                       ),
                                     ],
@@ -436,57 +540,6 @@ class _TrackingPageState extends State<TrackingPage> {
                       ),
                       const SizedBox(height: 25),
 
-                      // Order Details
-                      GlassContainer(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(25),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '📦 Detail Pesanan',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: textColor,
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-                            _buildDetailRow('👤', 'Pemesan', currentOrder.nama),
-                            _buildDetailRow(
-                              '🏪',
-                              'Jemput dari',
-                              currentOrder.alamatJemput,
-                            ),
-                            _buildDetailRow(
-                              '🏠',
-                              'Antar ke',
-                              currentOrder.alamatAntar,
-                            ),
-                            _buildDetailRow(
-                              '📦',
-                              'Jenis Barang',
-                              currentOrder.jenisBarang,
-                            ),
-                            if (currentOrder.catatan != null &&
-                                currentOrder.catatan!.isNotEmpty)
-                              _buildDetailRow(
-                                '📝',
-                                'Catatan',
-                                currentOrder.catatan!,
-                              ),
-                            _buildDetailRow('⏰', 'Estimasi', '15-30 menit'),
-                            _buildDetailRow(
-                              '🚚',
-                              'Status',
-                              currentOrder.status.displayName,
-                              valueColor: currentOrder.status.color,
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 25),
-
                       // Timeline
                       GlassContainer(
                         width: double.infinity,
@@ -503,32 +556,16 @@ class _TrackingPageState extends State<TrackingPage> {
                               ),
                             ),
                             const SizedBox(height: 25),
-                            _buildTimelineItem(
-                              'Pesanan diterima',
-                              '14:30',
-                              true,
-                            ),
-                            _buildTimelineItem(
-                              'Kurir menuju toko',
-                              '14:35',
-                              true,
-                            ),
-                            _buildTimelineItem(
-                              'Mengambil barang',
-                              '14:45',
-                              true,
-                            ),
-                            _buildTimelineItem(
-                              'Dalam perjalanan ke alamat',
-                              '15:00',
-                              currentOrder.status == OrderStatus.onTheWay,
-                            ),
-                            _buildTimelineItem(
-                              'Barang sampai tujuan',
-                              '-',
-                              currentOrder.status == OrderStatus.delivered,
-                              isLast: true,
-                            ),
+
+                            for (int i = 0; i < timelineSteps.length; i++)
+                              _buildTimelineItem(
+                                timelineSteps[i],
+                                timelineTimes[i] != null
+                                    ? _formatDateTime(timelineTimes[i]!)
+                                    : '-',
+                                i <= currentStep,
+                                isLast: i == timelineSteps.length - 1,
+                              ),
                           ],
                         ),
                       ),
@@ -598,32 +635,99 @@ class _TrackingPageState extends State<TrackingPage> {
                       ),
                       const SizedBox(height: 25),
 
-                      // Action Buttons
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _buildActionButton(
-                              icon: Icons.add_shopping_cart_rounded,
-                              label: 'Pesan Lagi',
-                              gradient: const LinearGradient(
-                                colors: [Color(0xFF667eea), Color(0xFF764ba2)],
-                              ),
-                              onTap: () => context.pushReplacement('/order'),
+                      // Tombol Detail Pesanan
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          icon: const Icon(
+                            Icons.receipt_long_rounded,
+                            color: Colors.white,
+                          ),
+                          label: const Text(
+                            'Detail Pesanan',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(width: 15),
-                          Expanded(
-                            child: _buildActionButton(
-                              icon: Icons.receipt_rounded,
-                              label: 'Detail Order',
-                              gradient: const LinearGradient(
-                                colors: [Color(0xFFf093fb), Color(0xFFf5576c)],
-                              ),
-                              onTap: _showOrderDetails,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF667eea),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
                             ),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
                           ),
-                        ],
+                          onPressed: () => _showOrderDetails(currentOrder),
+                        ),
                       ),
+                      const SizedBox(height: 15),
+
+                      // Tombol Batalkan Pesanan (hanya jika status pending)
+                      if (currentOrder.status == OrderStatus.pending)
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            icon: const Icon(
+                              Icons.cancel_rounded,
+                              color: Colors.white,
+                            ),
+                            label: const Text(
+                              'Batalkan Pesanan',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFf5576c),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                            ),
+                            onPressed: () async {
+                              final confirm = await showDialog<bool>(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: const Text('Konfirmasi Pembatalan'),
+                                  content: const Text(
+                                    'Yakin ingin membatalkan pesanan ini?',
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(false),
+                                      child: const Text('Batal'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(true),
+                                      child: const Text('Ya, Batalkan'),
+                                    ),
+                                  ],
+                                ),
+                              );
+                              if (confirm == true) {
+                                // TODO: Update status order di Firestore menjadi 'cancelled'
+                                // await FirebaseFirestore.instance
+                                //   .collection('orders')
+                                //   .doc(currentOrder.id)
+                                //   .update({'status': 'cancelled'});
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      'Pesanan berhasil dibatalkan.',
+                                    ),
+                                    backgroundColor: Color(0xFFf5576c),
+                                  ),
+                                );
+                                Navigator.of(
+                                  context,
+                                ).popUntil((route) => route.isFirst);
+                              }
+                            },
+                          ),
+                        ),
                       const SizedBox(height: 30),
                     ],
                   ),
@@ -636,194 +740,105 @@ class _TrackingPageState extends State<TrackingPage> {
     );
   }
 
-  Widget _buildDemoScreen() {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+  void _showOrderDetails(OrderModel order) {
     final textColor =
         Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white;
 
-    return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: isDarkMode
-                ? [
-                    const Color(0xFF0A0E21),
-                    const Color(0xFF1D1E33),
-                    const Color(0xFF0A0E21),
-                  ]
-                : [
-                    const Color(0xFFE8F0FE),
-                    const Color(0xFFF8F9FB),
-                    const Color(0xFFE8F0FE),
-                  ],
-          ),
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(20),
+    showDialog(
+      context: context,
+      builder: (context) => BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Dialog(
+          backgroundColor: Colors.transparent,
+          child: GlassContainer(
+            padding: const EdgeInsets.all(30),
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                // App Bar
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () => context.pop(),
-                      child: GlassContainer(
-                        width: 50,
-                        height: 50,
-                        padding: const EdgeInsets.all(12),
-                        child: Icon(
-                          Icons.arrow_back_rounded,
-                          color: textColor,
-                          size: 24,
-                        ),
-                      ),
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF667eea), Color(0xFF764ba2)],
                     ),
-                    const SizedBox(width: 20),
-                    Expanded(
-                      child: Text(
-                        'Lacak Pesanan',
-                        style: Theme.of(context).textTheme.headlineMedium,
-                      ),
-                    ),
-                  ],
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Icon(
+                    Icons.receipt_long_rounded,
+                    color: Colors.white,
+                    size: 30,
+                  ),
                 ),
-
-                // Demo Content
-                Expanded(
-                  child: Center(
-                    child: GlassContainer(
-                      padding: const EdgeInsets.all(40),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(25),
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: [Color(0xFF667eea), Color(0xFF764ba2)],
-                              ),
-                              borderRadius: BorderRadius.circular(25),
-                            ),
-                            child: const Icon(
-                              Icons.delivery_dining_rounded,
-                              size: 60,
-                              color: Colors.white,
-                            ),
-                          ),
-                          const SizedBox(height: 30),
-                          Text(
-                            '🚀 Demo Mode',
-                            style: TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
-                              color: isDarkMode ? Colors.white : Colors.black87,
-                            ),
-                          ),
-                          const SizedBox(height: 15),
-                          Text(
-                            'Menampilkan contoh tracking pesanan dengan data dummy untuk demo aplikasi',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: textColor.withAlpha(150),
-                              height: 1.5,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 40),
-                          Container(
-                            width: double.infinity,
-                            height: 55,
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: [Color(0xFF43e97b), Color(0xFF38f9d7)],
-                              ),
-                              borderRadius: BorderRadius.circular(18),
-                            ),
-                            child: ElevatedButton(
-                              onPressed: () {
-                                context.pushReplacement(
-                                  '/tracking',
-                                  extra: _dummyOrder,
-                                );
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.transparent,
-                                shadowColor: Colors.transparent,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(18),
-                                ),
-                              ),
-                              child: const Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.visibility_rounded,
-                                    color: Colors.white,
-                                  ),
-                                  SizedBox(width: 12),
-                                  Text(
-                                    'Lihat Demo Tracking',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 15),
-                          Container(
-                            width: double.infinity,
-                            height: 55,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(18),
-                              border: Border.all(
-                                color: isDarkMode
-                                    ? const Color(0xFF667eea)
-                                    : const Color(0xFF4A80F0),
-                                width: 2,
-                              ),
-                            ),
-                            child: ElevatedButton(
-                              onPressed: () =>
-                                  context.pushReplacement('/order'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.transparent,
-                                shadowColor: Colors.transparent,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(18),
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.add_rounded,
-                                    color: isDarkMode
-                                        ? const Color(0xFF667eea)
-                                        : const Color(0xFF4A80F0),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Text(
-                                    'Pesan Kurir Baru',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: isDarkMode
-                                          ? const Color(0xFF667eea)
-                                          : const Color(0xFF4A80F0),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
+                const SizedBox(height: 20),
+                Text(
+                  'Detail Pesanan',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: textColor,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Container(
+                  constraints: const BoxConstraints(maxHeight: 400),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        _buildOrderDetailRow('ID Pesanan', order.id),
+                        _buildOrderDetailRow(
+                          'Tanggal Pesan',
+                          _formatDateTime(order.createdAt),
+                        ),
+                        _buildOrderDetailRow('Nama Pemesan', order.nama),
+                        _buildOrderDetailRow('No. HP', order.phone),
+                        _buildOrderDetailRow(
+                          'Alamat Jemput',
+                          order.alamatJemput,
+                        ),
+                        _buildOrderDetailRow('Alamat Antar', order.alamatAntar),
+                        _buildOrderDetailRow('Jenis Barang', order.jenisBarang),
+                        if (order.catatan != null && order.catatan!.isNotEmpty)
+                          _buildOrderDetailRow('Catatan', order.catatan!),
+                        _buildOrderDetailRow(
+                          'Urgent',
+                          order.isUrgent ? 'Ya' : 'Tidak',
+                        ),
+                        _buildOrderDetailRow(
+                          'Total Ongkir',
+                          'Rp ${order.totalCost}',
+                        ),
+                        _buildOrderDetailRow(
+                          'Status',
+                          order.status.displayName,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 25),
+                Container(
+                  width: double.infinity,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF667eea), Color(0xFF764ba2)],
+                    ),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      shadowColor: Colors.transparent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ),
+                    child: const Text(
+                      'Tutup',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
@@ -834,6 +849,41 @@ class _TrackingPageState extends State<TrackingPage> {
         ),
       ),
     );
+  }
+
+  Widget _buildOrderDetailRow(String label, String value) {
+    final textColor =
+        Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 15),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 100,
+            child: Text(
+              '$label:',
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: textColor.withAlpha(150),
+                fontSize: 14,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: TextStyle(color: textColor, fontSize: 14),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _formatDateTime(DateTime dateTime) {
+    return '${dateTime.day}/${dateTime.month} ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
   }
 
   Widget _buildErrorState() {
@@ -958,51 +1008,6 @@ class _TrackingPageState extends State<TrackingPage> {
     );
   }
 
-  Widget _buildDetailRow(
-    String emoji,
-    String label,
-    String value, {
-    Color? valueColor,
-  }) {
-    // final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final textColor =
-        Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white;
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 15),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(emoji, style: const TextStyle(fontSize: 16)),
-          const SizedBox(width: 15),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: textColor.withAlpha(140),
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  value,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: valueColor ?? textColor,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildTimelineItem(
     String title,
     String time,
@@ -1090,7 +1095,6 @@ class _TrackingPageState extends State<TrackingPage> {
     String value, {
     Color? statusColor,
   }) {
-    // final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final textColor =
         Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white;
 
@@ -1128,394 +1132,20 @@ class _TrackingPageState extends State<TrackingPage> {
   }
 
   void _callKurir() {
-    // final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final textColor =
-        Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white;
-
-    showDialog(
-      context: context,
-      builder: (context) => BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Dialog(
-          backgroundColor: Colors.transparent,
-          child: GlassContainer(
-            padding: const EdgeInsets.all(30),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF4facfe), Color(0xFF00f2fe)],
-                    ),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Icon(
-                    Icons.phone_rounded,
-                    color: Colors.white,
-                    size: 30,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  'Hubungi Kurir',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: textColor,
-                  ),
-                ),
-                const SizedBox(height: 15),
-                Text(
-                  'Ahmad Kurniawan\n+62 812-9876-5432',
-                  style: TextStyle(fontSize: 16, color: textColor),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 25),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildActionButton(
-                        icon: Icons.phone_rounded,
-                        label: 'Telepon',
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF4facfe), Color(0xFF00f2fe)],
-                        ),
-                        onTap: () {
-                          Navigator.of(context).pop();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Membuka aplikasi telepon...'),
-                              backgroundColor: Color(0xFF4facfe),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    const SizedBox(width: 15),
-                    Expanded(
-                      child: _buildActionButton(
-                        icon: Icons.sms_rounded,
-                        label: 'SMS',
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF43e97b), Color(0xFF38f9d7)],
-                        ),
-                        onTap: () {
-                          Navigator.of(context).pop();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Mengirim SMS...'),
-                              backgroundColor: Color(0xFF43e97b),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Membuka aplikasi telepon...'),
+        backgroundColor: Color(0xFF4facfe),
       ),
     );
   }
 
   void _chatKurir() {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final textColor =
-        Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white;
-
-    showDialog(
-      context: context,
-      builder: (context) => BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Dialog(
-          backgroundColor: Colors.transparent,
-          child: GlassContainer(
-            padding: const EdgeInsets.all(30),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF43e97b), Color(0xFF38f9d7)],
-                    ),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Icon(
-                    Icons.chat_rounded,
-                    color: Colors.white,
-                    size: 30,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  'Chat WhatsApp',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: textColor,
-                  ),
-                ),
-                const SizedBox(height: 15),
-                Text(
-                  'Akan membuka chat WhatsApp dengan kurir:',
-                  style: TextStyle(fontSize: 16, color: textColor),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 20),
-                GlassContainer(
-                  padding: const EdgeInsets.all(20),
-                  alpha: 51,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Ahmad Kurniawan',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: textColor,
-                          fontSize: 16,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        '+62 812-9876-5432',
-                        style: TextStyle(color: textColor, fontSize: 14),
-                      ),
-                      const SizedBox(height: 15),
-                      Text(
-                        'Pesan otomatis: "Halo Pak Ahmad, saya ${currentOrder.nama}. Bagaimana status pengiriman pesanan saya?"',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: textColor.withAlpha(150),
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 25),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        height: 50,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15),
-                          border: Border.all(
-                            color: isDarkMode
-                                ? Colors.white.withAlpha(77)
-                                : Colors.black.withAlpha(77),
-                          ),
-                        ),
-                        child: ElevatedButton(
-                          onPressed: () => Navigator.of(context).pop(),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.transparent,
-                            shadowColor: Colors.transparent,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                          ),
-                          child: Text(
-                            'Batal',
-                            style: TextStyle(
-                              color: textColor,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 15),
-                    Expanded(
-                      child: _buildActionButton(
-                        icon: Icons.open_in_new_rounded,
-                        label: 'Buka WA',
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF43e97b), Color(0xFF38f9d7)],
-                        ),
-                        onTap: () {
-                          Navigator.of(context).pop();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Membuka WhatsApp...'),
-                              backgroundColor: Color(0xFF43e97b),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Membuka WhatsApp...'),
+        backgroundColor: Color(0xFF43e97b),
       ),
     );
-  }
-
-  void _showOrderDetails() {
-    // final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final textColor =
-        Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white;
-
-    showDialog(
-      context: context,
-      builder: (context) => BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Dialog(
-          backgroundColor: Colors.transparent,
-          child: GlassContainer(
-            padding: const EdgeInsets.all(30),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFFf093fb), Color(0xFFf5576c)],
-                    ),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Icon(
-                    Icons.receipt_rounded,
-                    color: Colors.white,
-                    size: 30,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  'Detail Pesanan',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: textColor,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Container(
-                  constraints: const BoxConstraints(maxHeight: 400),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        _buildOrderDetailRow('ID Pesanan', currentOrder.id),
-                        _buildOrderDetailRow(
-                          'Tanggal Pesan',
-                          _formatDateTime(currentOrder.createdAt),
-                        ),
-                        _buildOrderDetailRow('Nama Pemesan', currentOrder.nama),
-                        _buildOrderDetailRow('No. HP', currentOrder.phone),
-                        _buildOrderDetailRow(
-                          'Alamat Jemput',
-                          currentOrder.alamatJemput,
-                        ),
-                        _buildOrderDetailRow(
-                          'Alamat Antar',
-                          currentOrder.alamatAntar,
-                        ),
-                        _buildOrderDetailRow(
-                          'Jenis Barang',
-                          currentOrder.jenisBarang,
-                        ),
-                        if (currentOrder.catatan != null &&
-                            currentOrder.catatan!.isNotEmpty)
-                          _buildOrderDetailRow(
-                            'Catatan',
-                            currentOrder.catatan!,
-                          ),
-                        _buildOrderDetailRow(
-                          'Urgent',
-                          currentOrder.isUrgent ? 'Ya' : 'Tidak',
-                        ),
-                        _buildOrderDetailRow(
-                          'Total Ongkir',
-                          'Rp ${currentOrder.totalCost}',
-                        ),
-                        _buildOrderDetailRow(
-                          'Status',
-                          currentOrder.status.displayName,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 25),
-                Container(
-                  width: double.infinity,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF667eea), Color(0xFF764ba2)],
-                    ),
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  child: ElevatedButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
-                      shadowColor: Colors.transparent,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                    ),
-                    child: const Text(
-                      'Tutup',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildOrderDetailRow(String label, String value) {
-    // final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final textColor =
-        Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white;
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 15),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 100,
-            child: Text(
-              '$label:',
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                color: textColor.withAlpha(150),
-                fontSize: 14,
-              ),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: TextStyle(color: textColor, fontSize: 14),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  String _formatDateTime(DateTime dateTime) {
-    return '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
   }
 }

@@ -24,7 +24,7 @@ class _HistoryPageState extends State<HistoryPage>
     'Dalam Proses',
   ];
 
-  // Dummy data untuk history
+  // Dummy data untuk history (ganti dengan data Firestore pada implementasi nyata)
   late List<OrderModel> _historyOrders;
 
   @override
@@ -46,9 +46,9 @@ class _HistoryPageState extends State<HistoryPage>
   void _initializeDummyData() {
     _historyOrders = [
       OrderModel(
+        nama: 'Pak Joko',
+        phone: '081234567890',
         id: 'ORD-001',
-        nama: 'Budi Santoso',
-        phone: '+62 812-3456-7890',
         alamatJemput: 'Warung Bu Siti, Jl. Raya Desa No. 15',
         alamatAntar: 'Jl. Melati No. 8, RT 03/RW 01',
         jenisBarang: 'Makanan/Minuman',
@@ -56,11 +56,12 @@ class _HistoryPageState extends State<HistoryPage>
         isUrgent: false,
         createdAt: DateTime.now().subtract(const Duration(days: 2)),
         status: OrderStatus.delivered,
+        kurirName: 'Pak Budi',
       ),
       OrderModel(
+        phone: '082345678901',
+        nama: 'Ibu Ani',
         id: 'ORD-002',
-        nama: 'Siti Aminah',
-        phone: '+62 813-9876-5432',
         alamatJemput: 'Toko Kelontong Pak Joko, Jl. Mawar No. 20',
         alamatAntar: 'Jl. Anggrek No. 12, RT 02/RW 03',
         jenisBarang: 'Kebutuhan Harian',
@@ -68,55 +69,9 @@ class _HistoryPageState extends State<HistoryPage>
         isUrgent: true,
         createdAt: DateTime.now().subtract(const Duration(days: 5)),
         status: OrderStatus.delivered,
+        kurirName: 'Mas Joko',
       ),
-      OrderModel(
-        id: 'ORD-003',
-        nama: 'Ahmad Fauzi',
-        phone: '+62 814-1234-5678',
-        alamatJemput: 'Apotek Sehat, Jl. Kesehatan No. 5',
-        alamatAntar: 'Jl. Dahlia No. 25, RT 01/RW 02',
-        jenisBarang: 'Obat-obatan',
-        catatan: 'Obat untuk ibu, sudah ada resep',
-        isUrgent: false,
-        createdAt: DateTime.now().subtract(const Duration(days: 7)),
-        status: OrderStatus.cancelled,
-      ),
-      OrderModel(
-        id: 'ORD-004',
-        nama: 'Dewi Lestari',
-        phone: '+62 815-5555-6666',
-        alamatJemput: 'Toko Elektronik Maju, Jl. Teknologi No. 10',
-        alamatAntar: 'Jl. Cempaka No. 18, RT 04/RW 01',
-        jenisBarang: 'Elektronik',
-        catatan: 'Charger HP Samsung',
-        isUrgent: false,
-        createdAt: DateTime.now().subtract(const Duration(days: 10)),
-        status: OrderStatus.delivered,
-      ),
-      OrderModel(
-        id: 'ORD-005',
-        nama: 'Rizki Pratama',
-        phone: '+62 816-7777-8888',
-        alamatJemput: 'Warung Makan Sederhana, Jl. Rasa No. 7',
-        alamatAntar: 'Jl. Kenanga No. 30, RT 05/RW 02',
-        jenisBarang: 'Makanan/Minuman',
-        catatan: 'Nasi gudeg 2 porsi',
-        isUrgent: true,
-        createdAt: DateTime.now().subtract(const Duration(hours: 3)),
-        status: OrderStatus.onTheWay,
-      ),
-      OrderModel(
-        id: 'ORD-006',
-        nama: 'Maya Sari',
-        phone: '+62 817-9999-0000',
-        alamatJemput: 'Toko Baju Fashion, Jl. Mode No. 15',
-        alamatAntar: 'Jl. Flamboyan No. 22, RT 03/RW 04',
-        jenisBarang: 'Pakaian',
-        catatan: 'Baju anak ukuran M',
-        isUrgent: false,
-        createdAt: DateTime.now().subtract(const Duration(days: 1)),
-        status: OrderStatus.delivered,
-      ),
+      // ...tambahkan data lain sesuai kebutuhan
     ];
   }
 
@@ -213,19 +168,6 @@ class _HistoryPageState extends State<HistoryPage>
                           ),
                         ),
                       ),
-                      // GestureDetector(
-                      //   onTap: _showFilterDialog,
-                      //   child: GlassContainer(
-                      //     width: 50,
-                      //     height: 50,
-                      //     padding: const EdgeInsets.all(12),
-                      //     child: Icon(
-                      //       Icons.filter_list_rounded,
-                      //       color: textColor,
-                      //       size: 24,
-                      //     ),
-                      //   ),
-                      // ),
                     ],
                   ),
                 ),
@@ -298,46 +240,6 @@ class _HistoryPageState extends State<HistoryPage>
                 ),
                 const SizedBox(height: 20),
 
-                // Statistics Card
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: GlassContainer(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(20),
-                    child: Row(
-                      children: [
-                        _buildStatItem(
-                          'Total Pesanan',
-                          _historyOrders.length.toString(),
-                          Icons.receipt_long_rounded,
-                          const Color(0xFF4facfe),
-                        ),
-                        const SizedBox(width: 20),
-                        _buildStatItem(
-                          'Selesai',
-                          _historyOrders
-                              .where((o) => o.status == OrderStatus.delivered)
-                              .length
-                              .toString(),
-                          Icons.check_circle_rounded,
-                          const Color(0xFF43e97b),
-                        ),
-                        const SizedBox(width: 20),
-                        _buildStatItem(
-                          'Dibatalkan',
-                          _historyOrders
-                              .where((o) => o.status == OrderStatus.cancelled)
-                              .length
-                              .toString(),
-                          Icons.cancel_rounded,
-                          const Color(0xFFf5576c),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-
                 // Orders List
                 Expanded(
                   child: _filteredOrders.isEmpty
@@ -359,45 +261,6 @@ class _HistoryPageState extends State<HistoryPage>
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildStatItem(
-    String label,
-    String value,
-    IconData icon,
-    Color color,
-  ) {
-    final textColor =
-        Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white;
-
-    return Expanded(
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: color.withAlpha(51),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(icon, color: color, size: 24),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: textColor,
-            ),
-          ),
-          Text(
-            label,
-            style: TextStyle(fontSize: 12, color: textColor.withAlpha(150)),
-            textAlign: TextAlign.center,
-          ),
-        ],
       ),
     );
   }
@@ -488,48 +351,6 @@ class _HistoryPageState extends State<HistoryPage>
                   ),
                 ],
               ),
-              const SizedBox(height: 15),
-
-              // Customer Info
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF4facfe).withAlpha(51),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Icon(
-                      Icons.person_rounded,
-                      color: Color(0xFF4facfe),
-                      size: 16,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          order.nama,
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: textColor,
-                          ),
-                        ),
-                        Text(
-                          order.phone,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: textColor.withAlpha(150),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
               const SizedBox(height: 12),
 
               // Item Info
@@ -594,7 +415,7 @@ class _HistoryPageState extends State<HistoryPage>
                     ),
                 ],
               ),
-              const SizedBox(height: 15),
+              const SizedBox(height: 12),
 
               // Address Info
               Container(
@@ -672,7 +493,28 @@ class _HistoryPageState extends State<HistoryPage>
                   ],
                 ),
               ),
-              const SizedBox(height: 15),
+              const SizedBox(height: 12),
+
+              // Kurir Info (opsional)
+              if (order.kurirName != null)
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.delivery_dining_rounded,
+                      size: 16,
+                      color: Color(0xFF43e97b),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      order.kurirName!,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: textColor.withAlpha(180),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
 
               // Footer
               Row(
@@ -741,7 +583,6 @@ class _HistoryPageState extends State<HistoryPage>
   }
 
   Widget _buildEmptyState() {
-    // final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final textColor =
         Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white;
 
@@ -827,105 +668,54 @@ class _HistoryPageState extends State<HistoryPage>
     );
   }
 
-  // void _showFilterDialog() {
-  //   final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-  //   final textColor =
-  //       Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white;
+  IconData _getStatusIcon(OrderStatus status) {
+    switch (status) {
+      case OrderStatus.pending:
+        return Icons.schedule_rounded;
+      case OrderStatus.confirmed:
+        return Icons.check_circle_outline_rounded;
+      case OrderStatus.onTheWay:
+        return Icons.delivery_dining_rounded;
+      case OrderStatus.delivered:
+        return Icons.check_circle_rounded;
+      case OrderStatus.cancelled:
+        return Icons.cancel_rounded;
+      case OrderStatus.pickingUp:
+        return Icons.cancel_rounded;
+    }
+  }
 
-  //   showDialog(
-  //     context: context,
-  //     builder: (context) => BackdropFilter(
-  //       filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-  //       child: Dialog(
-  //         backgroundColor: Colors.transparent,
-  //         child: GlassContainer(
-  //           padding: const EdgeInsets.all(25),
-  //           child: Column(
-  //             mainAxisSize: MainAxisSize.min,
-  //             children: [
-  //               Text(
-  //                 'Filter Pesanan',
-  //                 style: TextStyle(
-  //                   fontSize: 20,
-  //                   fontWeight: FontWeight.bold,
-  //                   color: textColor,
-  //                 ),
-  //               ),
-  //               const SizedBox(height: 20),
-  //               ..._filterOptions.map((filter) {
-  //                 final isSelected = _selectedFilter == filter;
-  //                 return Padding(
-  //                   padding: const EdgeInsets.only(bottom: 10),
-  //                   child: GestureDetector(
-  //                     onTap: () {
-  //                       setState(() {
-  //                         _selectedFilter = filter;
-  //                       });
-  //                       Navigator.of(context).pop();
-  //                     },
-  //                     child: Container(
-  //                       width: double.infinity,
-  //                       padding: const EdgeInsets.all(15),
-  //                       decoration: BoxDecoration(
-  //                         gradient: isSelected
-  //                             ? const LinearGradient(
-  //                                 colors: [
-  //                                   Color(0xFF667eea),
-  //                                   Color(0xFF764ba2),
-  //                                 ],
-  //                               )
-  //                             : null,
-  //                         color: isSelected
-  //                             ? null
-  //                             : (isDarkMode
-  //                                   ? Colors.white.withAlpha(26)
-  //                                   : Colors.black.withAlpha(10)),
-  //                         borderRadius: BorderRadius.circular(12),
-  //                         border: Border.all(
-  //                           color: isSelected
-  //                               ? Colors.transparent
-  //                               : (isDarkMode
-  //                                     ? Colors.white.withAlpha(51)
-  //                                     : Colors.black.withAlpha(20)),
-  //                         ),
-  //                       ),
-  //                       child: Row(
-  //                         children: [
-  //                           Icon(
-  //                             _getFilterIcon(filter),
-  //                             color: isSelected ? Colors.white : textColor,
-  //                             size: 20,
-  //                           ),
-  //                           const SizedBox(width: 12),
-  //                           Text(
-  //                             filter,
-  //                             style: TextStyle(
-  //                               color: isSelected ? Colors.white : textColor,
-  //                               fontWeight: isSelected
-  //                                   ? FontWeight.bold
-  //                                   : FontWeight.w500,
-  //                             ),
-  //                           ),
-  //                           const Spacer(),
-  //                           if (isSelected)
-  //                             const Icon(
-  //                               Icons.check_rounded,
-  //                               color: Colors.white,
-  //                               size: 20,
-  //                             ),
-  //                         ],
-  //                       ),
-  //                     ),
-  //                   ),
-  //                 );
-  //               }),
-  //             ],
-  //           ),
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
+  IconData _getCategoryIcon(String category) {
+    switch (category) {
+      case 'Makanan/Minuman':
+        return Icons.restaurant_rounded;
+      case 'Obat-obatan':
+        return Icons.medical_services_rounded;
+      case 'Kebutuhan Harian':
+        return Icons.shopping_cart_rounded;
+      case 'Elektronik':
+        return Icons.devices_rounded;
+      case 'Pakaian':
+        return Icons.checkroom_rounded;
+      default:
+        return Icons.inventory_rounded;
+    }
+  }
+
+  String _formatDateTime(DateTime dateTime) {
+    final now = DateTime.now();
+    final difference = now.difference(dateTime);
+
+    if (difference.inDays == 0) {
+      return 'Hari ini ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+    } else if (difference.inDays == 1) {
+      return 'Kemarin ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+    } else if (difference.inDays < 7) {
+      return '${difference.inDays} hari lalu';
+    } else {
+      return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
+    }
+  }
 
   void _showOrderDetails(OrderModel order) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
@@ -1002,8 +792,6 @@ class _HistoryPageState extends State<HistoryPage>
                           'Tanggal Pesan',
                           _formatDateTime(order.createdAt),
                         ),
-                        _buildDetailRow('👤', 'Nama Pemesan', order.nama),
-                        _buildDetailRow('📱', 'No. HP', order.phone),
                         _buildDetailRow(
                           '🏪',
                           'Alamat Jemput',
@@ -1037,6 +825,8 @@ class _HistoryPageState extends State<HistoryPage>
                           order.status.displayName,
                           valueColor: order.status.color,
                         ),
+                        if (order.kurirName != null)
+                          _buildDetailRow('🚚', 'Kurir', order.kurirName!),
                       ],
                     ),
                   ),
@@ -1078,7 +868,7 @@ class _HistoryPageState extends State<HistoryPage>
                                 ),
                                 SizedBox(width: 8),
                                 Text(
-                                  'Lacak',
+                                  'Lacak Pesanan',
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
@@ -1354,69 +1144,5 @@ class _HistoryPageState extends State<HistoryPage>
         ),
       ),
     );
-  }
-
-  IconData _getStatusIcon(OrderStatus status) {
-    switch (status) {
-      case OrderStatus.pending:
-        return Icons.schedule_rounded;
-      case OrderStatus.confirmed:
-        return Icons.check_circle_outline_rounded;
-      case OrderStatus.onTheWay:
-        return Icons.delivery_dining_rounded;
-      case OrderStatus.delivered:
-        return Icons.check_circle_rounded;
-      case OrderStatus.cancelled:
-        return Icons.cancel_rounded;
-      case OrderStatus.pickingUp:
-        return Icons.cancel_rounded;
-    }
-  }
-
-  IconData _getCategoryIcon(String category) {
-    switch (category) {
-      case 'Makanan/Minuman':
-        return Icons.restaurant_rounded;
-      case 'Obat-obatan':
-        return Icons.medical_services_rounded;
-      case 'Kebutuhan Harian':
-        return Icons.shopping_cart_rounded;
-      case 'Elektronik':
-        return Icons.devices_rounded;
-      case 'Pakaian':
-        return Icons.checkroom_rounded;
-      default:
-        return Icons.inventory_rounded;
-    }
-  }
-
-  // IconData _getFilterIcon(String filter) {
-  //   switch (filter) {
-  //     case 'Semua':
-  //       return Icons.list_rounded;
-  //     case 'Selesai':
-  //       return Icons.check_circle_rounded;
-  //     case 'Dibatalkan':
-  //       return Icons.cancel_rounded;
-  //     case 'Dalam Proses':
-  //       return Icons.delivery_dining_rounded;
-  //     default:
-  //       return Icons.filter_list_rounded;
-  //   }
-  // }
-
-  String _formatDateTime(DateTime dateTime) {
-    final now = DateTime.now();
-    final difference = now.difference(dateTime);
-
-    if (difference.inDays == 0) {
-      return 'Hari ini ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
-    } else if (difference.inDays == 1) {
-      return 'Kemarin ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
-    } else if (difference.inDays < 7) {
-      return '${difference.inDays} hari lalu';
-    } else {
-      return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
-    }
   }
 }

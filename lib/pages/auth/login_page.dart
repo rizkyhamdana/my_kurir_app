@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:my_kurir_app/main.dart';
+import 'package:my_kurir_app/util/session_manager.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -16,7 +17,25 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
-  final bool _isLoading = false;
+  bool _isLoading = false;
+
+  Future<void> _handleLogin() async {
+    if (_formKey.currentState?.validate() ?? false) {
+      setState(() => _isLoading = true);
+      // Simulasi login sukses, ganti dengan API login asli
+      await Future.delayed(const Duration(seconds: 1));
+      final userId = _phoneController.text;
+      await SessionManager.saveLoginSession(userId, _role.name);
+      setState(() => _isLoading = false);
+      if (_role == LoginRole.kurir) {
+        if (!mounted) return;
+        context.go('/kurir-home');
+      } else {
+        if (!mounted) return;
+        context.go('/home');
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -144,36 +163,35 @@ class _LoginPageState extends State<LoginPage> {
                                 borderRadius: BorderRadius.circular(15),
                               ),
                             ),
-                            onPressed: _isLoading
-                                ? null
-                                : () {
-                                    // if (_formKey.currentState?.validate() ??
-                                    //     false) {
-                                    //   setState(() => _isLoading = true);
-                                    //   // Simulasi login
-                                    //   Future.delayed(
-                                    //     const Duration(seconds: 1),
-                                    //     () {
-                                    //       setState(() => _isLoading = false);
-                                    //       // TODO: Ganti dengan navigasi sesuai role
-                                    //       ScaffoldMessenger.of(
-                                    //         context,
-                                    //       ).showSnackBar(
-                                    //         SnackBar(
-                                    //           content: Text(
-                                    //             _role == LoginRole.kurir
-                                    //                 ? 'Login sebagai Kurir'
-                                    //                 : 'Login sebagai Pelanggan',
-                                    //           ),
-                                    //         ),
-                                    //       );
-                                    //     },
-                                    //   );
-                                    // }
-                                    _role == LoginRole.kurir
-                                        ? context.go('/kurir-home')
-                                        : context.go('/home');
-                                  },
+                            onPressed: _isLoading ? null : _handleLogin,
+                            // : () {
+                            // if (_formKey.currentState?.validate() ??
+                            //     false) {
+                            //   setState(() => _isLoading = true);
+                            //   // Simulasi login
+                            //   Future.delayed(
+                            //     const Duration(seconds: 1),
+                            //     () {
+                            //       setState(() => _isLoading = false);
+                            //       // TODO: Ganti dengan navigasi sesuai role
+                            //       ScaffoldMessenger.of(
+                            //         context,
+                            //       ).showSnackBar(
+                            //         SnackBar(
+                            //           content: Text(
+                            //             _role == LoginRole.kurir
+                            //                 ? 'Login sebagai Kurir'
+                            //                 : 'Login sebagai Pelanggan',
+                            //           ),
+                            //         ),
+                            //       );
+                            //     },
+                            //   );
+                            // }
+                            //   _role == LoginRole.kurir
+                            //       ? context.go('/kurir-home')
+                            //       : context.go('/home');
+                            // },
                             child: _isLoading
                                 ? const CircularProgressIndicator(
                                     color: Colors.white,

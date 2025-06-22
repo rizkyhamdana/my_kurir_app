@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 class OrderModel {
   final String id;
   final String nama;
+  final String? kurirName;
+  final String? kurirPhone;
   final String phone;
   final String alamatJemput;
   final String alamatAntar;
@@ -11,10 +13,22 @@ class OrderModel {
   final bool isUrgent;
   final DateTime createdAt;
   final OrderStatus status;
+  final DateTime? confirmedAt;
+  final DateTime? pickingUpAt;
+  final DateTime? onTheWayAt;
+  final DateTime? deliveredAt;
+  final DateTime? cancelledAt;
 
   OrderModel({
+    this.confirmedAt,
+    this.pickingUpAt,
+    this.onTheWayAt,
+    this.deliveredAt,
+    this.cancelledAt,
     required this.id,
     required this.nama,
+    this.kurirName,
+    this.kurirPhone,
     required this.phone,
     required this.alamatJemput,
     required this.alamatAntar,

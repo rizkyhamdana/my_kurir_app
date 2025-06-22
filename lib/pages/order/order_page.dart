@@ -19,7 +19,8 @@ class _OrderPageState extends State<OrderPage> {
   final _alamatJemputController = TextEditingController();
   final _alamatAntarController = TextEditingController();
   final _catatanController = TextEditingController();
-
+  LatLng? _jemputLatLng;
+  LatLng? _antarLatLng;
   String _jenisBarang = 'Makanan/Minuman';
   bool _isUrgent = false;
 
@@ -146,36 +147,36 @@ class _OrderPageState extends State<OrderPage> {
                         const SizedBox(height: 30),
 
                         // Data Pemesan Section
-                        _buildSectionTitle('👤 Data Pemesan'),
-                        const SizedBox(height: 15),
+                        // _buildSectionTitle('👤 Data Pemesan'),
+                        // const SizedBox(height: 15),
 
-                        _buildModernTextField(
-                          controller: _namaController,
-                          label: 'Nama Lengkap',
-                          icon: Icons.person_rounded,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Nama harus diisi';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 20),
+                        // _buildModernTextField(
+                        //   controller: _namaController,
+                        //   label: 'Nama Lengkap',
+                        //   icon: Icons.person_rounded,
+                        //   validator: (value) {
+                        //     if (value == null || value.isEmpty) {
+                        //       return 'Nama harus diisi';
+                        //     }
+                        //     return null;
+                        //   },
+                        // ),
+                        // const SizedBox(height: 20),
 
-                        _buildModernTextField(
-                          controller: _phoneController,
-                          label: 'No. WhatsApp',
-                          icon: Icons.phone_rounded,
-                          hint: '08xxxxxxxxxx',
-                          keyboardType: TextInputType.phone,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Nomor WhatsApp harus diisi';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 30),
+                        // _buildModernTextField(
+                        //   controller: _phoneController,
+                        //   label: 'No. WhatsApp',
+                        //   icon: Icons.phone_rounded,
+                        //   hint: '08xxxxxxxxxx',
+                        //   keyboardType: TextInputType.phone,
+                        //   validator: (value) {
+                        //     if (value == null || value.isEmpty) {
+                        //       return 'Nomor WhatsApp harus diisi';
+                        //     }
+                        //     return null;
+                        //   },
+                        // ),
+                        // const SizedBox(height: 30),
 
                         // Detail Pengiriman Section
                         _buildSectionTitle('📦 Detail Pengiriman'),
@@ -198,11 +199,18 @@ class _OrderPageState extends State<OrderPage> {
                               '/pick-location',
                             );
                             if (picked != null) {
-                              _alamatJemputController.text =
-                                  'Lat: ${picked.latitude}, Lng: ${picked.longitude}';
-                              setState(() {});
+                              _jemputLatLng = picked;
+                              // _alamatJemputController.text =
+                              //     'Lat: ${picked.latitude}, Lng: ${picked.longitude}';
+                              // setState(() {});
                             }
                           },
+                          trailing: _jemputLatLng != null
+                              ? const Icon(
+                                  Icons.check_circle,
+                                  color: Colors.green,
+                                )
+                              : null,
                         ),
                         const SizedBox(height: 20),
 
@@ -223,11 +231,18 @@ class _OrderPageState extends State<OrderPage> {
                               '/pick-location',
                             );
                             if (picked != null) {
-                              _alamatAntarController.text =
-                                  'Lat: ${picked.latitude}, Lng: ${picked.longitude}';
+                              _antarLatLng = picked;
+                              // _alamatAntarController.text =
+                              //     'Lat: ${picked.latitude}, Lng: ${picked.longitude}';
                               setState(() {});
                             }
                           },
+                          trailing: _antarLatLng != null
+                              ? const Icon(
+                                  Icons.check_circle,
+                                  color: Colors.green,
+                                )
+                              : null,
                         ),
                         const SizedBox(height: 20),
 
@@ -615,6 +630,7 @@ class _OrderPageState extends State<OrderPage> {
     TextInputType? keyboardType,
     String? Function(String?)? validator,
     VoidCallback? onPickLocation,
+    Widget? trailing, // Tambahkan parameter trailing
   }) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final textColor =
@@ -659,6 +675,7 @@ class _OrderPageState extends State<OrderPage> {
                   onPressed: onPickLocation,
                 ),
               ],
+              if (trailing != null) ...[const SizedBox(width: 8), trailing],
             ],
           ),
           const SizedBox(height: 15),

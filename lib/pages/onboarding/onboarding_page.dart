@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:my_kurir_app/util/session_manager.dart';
 import '../../widgets/glass_container.dart';
 import '../../models/onboarding_model.dart';
 import '../../data/onboarding_data.dart';
@@ -83,11 +84,14 @@ class _OnboardingPageState extends State<OnboardingPage>
         curve: Curves.easeInOut,
       );
     } else {
+      if (!mounted) return;
       context.go('/login');
     }
   }
 
-  void _skipOnboarding() {
+  void _skipOnboarding() async {
+    await SessionManager.setOnboardingShown();
+    if (!mounted) return;
     context.go('/login');
   }
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:my_kurir_app/util/session_manager.dart';
 
 class SplashScreenPage extends StatefulWidget {
   const SplashScreenPage({super.key});
@@ -29,9 +30,32 @@ class _SplashScreenPageState extends State<SplashScreenPage>
 
     _controller.forward();
 
-    Future.delayed(const Duration(milliseconds: 4000), () {
-      if (mounted) context.go('/onboarding');
-    });
+    _handleSplash();
+  }
+
+  Future<void> _handleSplash() async {
+    await Future.delayed(const Duration(milliseconds: 2000));
+    final isOnboarding = await SessionManager.isOnboardingShown();
+    if (!mounted) return;
+    if (!isOnboarding) {
+      context.go('/onboarding');
+    } else {
+      // Cek session login
+      final valid = await SessionManager.isSessionValid();
+      if (!mounted) return;
+      if (valid) {
+        final role = await SessionManager.getRole();
+        if (role == 'kurir') {
+          if (!mounted) return;
+          context.go('/kurir-home');
+        } else {
+          if (!mounted) return;
+          context.go('/home');
+        }
+      } else {
+        context.go('/login');
+      }
+    }
   }
 
   @override

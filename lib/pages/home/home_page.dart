@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:my_kurir_app/util/performace_util.dart';
+import 'package:my_kurir_app/util/session_manager.dart';
 import '../../widgets/glass_container.dart';
 import 'dart:ui';
 
@@ -16,6 +17,70 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   late AnimationController _controller;
   late AnimationController _floatingController;
   late Animation<double> _fadeAnimation;
+
+  Future<bool> _onWillPop() async {
+    final result = await showModalBottomSheet<bool>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) => Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.logout_rounded,
+              size: 40,
+              color: Color(0xFFf5576c),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Keluar dari aplikasi?',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              'Apakah Anda yakin ingin logout?',
+              style: TextStyle(fontSize: 14, color: Colors.black54),
+            ),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    child: const Text('Batal'),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFf5576c),
+                    ),
+                    onPressed: () => Navigator.pop(context, true),
+                    child: const Text(
+                      'Logout',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+    if (result == true) {
+      await SessionManager.clearSession();
+      if (mounted) {
+        Navigator.of(context).pop(); // keluar dari halaman home
+      }
+      return false; // jangan pop otomatis, sudah di-handle
+    }
+    return false; // batal, tetap di halaman
+  }
 
   @override
   void initState() {
@@ -56,79 +121,86 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     // final textColor =
     //     Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white;
 
-    return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: isDarkMode
-                ? [
-                    const Color(0xFF0A0E21),
-                    const Color(0xFF1D1E33),
-                    const Color(0xFF2A2D3A),
-                    const Color(0xFF0A0E21),
-                  ]
-                : [
-                    const Color(0xFFE8F0FE),
-                    const Color(0xFFF8F9FB),
-                    const Color(0xFFE3F2FD),
-                    const Color(0xFFF1F8E9),
-                  ],
+    return PopScope(
+      canPop: false, // agar pop dikontrol manual
+      onPopInvokedWithResult: (didPop, _) async {
+        if (didPop) return;
+        await _onWillPop(); // panggil fungsi konfirmasi logout
+      },
+      child: Scaffold(
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: isDarkMode
+                  ? [
+                      const Color(0xFF0A0E21),
+                      const Color(0xFF1D1E33),
+                      const Color(0xFF2A2D3A),
+                      const Color(0xFF0A0E21),
+                    ]
+                  : [
+                      const Color(0xFFE8F0FE),
+                      const Color(0xFFF8F9FB),
+                      const Color(0xFFE3F2FD),
+                      const Color(0xFFF1F8E9),
+                    ],
+            ),
           ),
-        ),
-        child: SafeArea(
-          child: _isLoading
-              ? _buildLoadingScreen()
-              : FadeTransition(
-                  opacity: _fadeAnimation,
-                  child: SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Animated Header
-                        _buildHeader(),
-                        const SizedBox(height: 30),
+          child: SafeArea(
+            child: _isLoading
+                ? _buildLoadingScreen()
+                : FadeTransition(
+                    opacity: _fadeAnimation,
+                    child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Animated Header
+                          _buildHeader(),
+                          const SizedBox(height: 30),
 
-                        // Floating Hero Banner
-                        _buildHeroBanner(),
-                        const SizedBox(height: 40),
+                          // Floating Hero Banner
+                          _buildHeroBanner(),
+                          const SizedBox(height: 40),
 
-                        // Quick Stats
-                        _buildQuickStats(),
-                        const SizedBox(height: 30),
+                          // Quick Stats
+                          _buildQuickStats(),
+                          const SizedBox(height: 30),
 
-                        // Service Cards with staggered animation
-                        _buildSectionTitle('🚀 Layanan Kami'),
-                        const SizedBox(height: 20),
-                        _buildServiceCards(),
-                        const SizedBox(height: 40),
+                          // Service Cards with staggered animation
+                          _buildSectionTitle('🚀 Layanan Kami'),
+                          const SizedBox(height: 20),
+                          _buildServiceCards(),
+                          const SizedBox(height: 40),
 
-                        // Features Grid
-                        // _buildSectionTitle('✨ Keunggulan Kami'),
-                        // const SizedBox(height: 20),
-                        // _buildFeaturesGrid(),
-                        // const SizedBox(height: 40),
+                          // Features Grid
+                          // _buildSectionTitle('✨ Keunggulan Kami'),
+                          // const SizedBox(height: 20),
+                          // _buildFeaturesGrid(),
+                          // const SizedBox(height: 40),
 
-                        // Info Cards with enhanced design
-                        _buildSectionTitle('📋 Informasi Layanan'),
-                        const SizedBox(height: 20),
-                        _buildEnhancedInfoCards(),
-                        const SizedBox(height: 30),
+                          // Info Cards with enhanced design
+                          _buildSectionTitle('📋 Informasi Layanan'),
+                          const SizedBox(height: 20),
+                          _buildEnhancedInfoCards(),
+                          const SizedBox(height: 30),
 
-                        // Testimonial Section
-                        // _buildTestimonialSection(),
-                        // const SizedBox(height: 30),
+                          // Testimonial Section
+                          // _buildTestimonialSection(),
+                          // const SizedBox(height: 30),
 
-                        // Call to Action
-                        // _buildCallToAction(),
-                        // const SizedBox(height: 30),
-                      ],
+                          // Call to Action
+                          // _buildCallToAction(),
+                          // const SizedBox(height: 30),
+                        ],
+                      ),
                     ),
                   ),
-                ),
+          ),
         ),
       ),
     );

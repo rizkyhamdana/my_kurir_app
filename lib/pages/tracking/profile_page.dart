@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:my_kurir_app/main.dart';
+import 'package:my_kurir_app/util/session_manager.dart';
 import '../../widgets/glass_container.dart';
 import 'dart:ui';
 
@@ -1100,6 +1101,7 @@ class ProfilePage extends StatelessWidget {
                         child: ElevatedButton(
                           onPressed: () {
                             Navigator.of(context).pop();
+                            SessionManager.clearSession();
                             // TODO: Implement logout logic
                             context.go('/login');
                           },
