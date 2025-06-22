@@ -18,7 +18,7 @@ class PerformanceUtils {
 
     // Jika debug mode, anggap device bagus
     if (kDebugMode) {
-      _isLowEndDevice = true;
+      _isLowEndDevice = true; // Untuk testing, bisa diubah sesuai kebutuhan
       return;
     }
 

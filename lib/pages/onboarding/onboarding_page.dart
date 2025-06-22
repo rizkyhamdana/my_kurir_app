@@ -23,7 +23,6 @@ class _OnboardingPageState extends State<OnboardingPage>
   late AnimationController _floatingController;
   late Animation<double> _fadeAnimation;
   late Animation<double> _slideAnimation;
-  late Animation<double> _floatingAnimation;
 
   @override
   void initState() {
@@ -51,10 +50,6 @@ class _OnboardingPageState extends State<OnboardingPage>
 
     _slideAnimation = Tween<double>(begin: 50, end: 0).animate(
       CurvedAnimation(parent: _slideController, curve: Curves.elasticOut),
-    );
-
-    _floatingAnimation = Tween<double>(begin: -10, end: 10).animate(
-      CurvedAnimation(parent: _floatingController, curve: Curves.easeInOut),
     );
 
     // Start animations
@@ -244,71 +239,64 @@ class _OnboardingPageState extends State<OnboardingPage>
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // Floating Icon Container
-                AnimatedBuilder(
-                  animation: _floatingAnimation,
-                  builder: (context, child) {
-                    return Transform.translate(
-                      offset: Offset(0, _floatingAnimation.value),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(40),
-                          boxShadow: [
-                            BoxShadow(
-                              color: (isDarkMode ? Colors.white : Colors.black)
-                                  .withAlpha(13),
-                              blurRadius: 30,
-                              offset: const Offset(0, 15),
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(40),
+                    boxShadow: [
+                      BoxShadow(
+                        color: (isDarkMode ? Colors.white : Colors.black)
+                            .withAlpha(13),
+                        blurRadius: 30,
+                        offset: const Offset(0, 15),
+                      ),
+                    ],
+                  ),
+                  child: GlassContainer(
+                    width: 200,
+                    height: 200,
+                    borderRadius: BorderRadius.circular(40),
+                    child: Stack(
+                      children: [
+                        // Background gradient
+                        Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                data.gradientColors.first.withAlpha(51),
+                                data.gradientColors.last.withAlpha(26),
+                              ],
                             ),
-                          ],
-                        ),
-                        child: GlassContainer(
-                          width: 200,
-                          height: 200,
-                          borderRadius: BorderRadius.circular(40),
-                          child: Stack(
-                            children: [
-                              // Background gradient
-                              Container(
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      data.gradientColors.first.withAlpha(51),
-                                      data.gradientColors.last.withAlpha(26),
-                                    ],
-                                  ),
-                                  borderRadius: BorderRadius.circular(40),
-                                ),
-                              ),
-                              // Icon
-                              Center(
-                                child: Container(
-                                  padding: const EdgeInsets.all(25),
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors: data.gradientColors,
-                                    ),
-                                    borderRadius: BorderRadius.circular(25),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: data.gradientColors.first
-                                            .withAlpha(77),
-                                        blurRadius: 20,
-                                        offset: const Offset(0, 10),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Text(
-                                    data.icon,
-                                    style: const TextStyle(fontSize: 60),
-                                  ),
-                                ),
-                              ),
-                            ],
+                            borderRadius: BorderRadius.circular(40),
                           ),
                         ),
-                      ),
-                    );
-                  },
+                        // Icon
+                        Center(
+                          child: Container(
+                            padding: const EdgeInsets.all(25),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: data.gradientColors,
+                              ),
+                              borderRadius: BorderRadius.circular(25),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: data.gradientColors.first.withAlpha(
+                                    77,
+                                  ),
+                                  blurRadius: 20,
+                                  offset: const Offset(0, 10),
+                                ),
+                              ],
+                            ),
+                            child: Text(
+                              data.icon,
+                              style: const TextStyle(fontSize: 60),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
 
                 const SizedBox(height: 60),
@@ -533,7 +521,7 @@ class _OnboardingPageState extends State<OnboardingPage>
                       children: [
                         Text(
                           _currentIndex == _onboardingData.length - 1
-                              ? 'Mulai Sekarang'
+                              ? 'Mulai'
                               : 'Selanjutnya',
                           style: const TextStyle(
                             color: Colors.white,

@@ -777,7 +777,6 @@ class _RegisterPageState extends State<RegisterPage> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const SizedBox(height: 12),
                                     RichText(
                                       text: TextSpan(
                                         style: TextStyle(

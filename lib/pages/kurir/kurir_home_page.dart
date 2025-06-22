@@ -17,7 +17,6 @@ class _KurirHomePageState extends State<KurirHomePage>
   late AnimationController _controller;
   late AnimationController _floatingController;
   late Animation<double> _fadeAnimation;
-  late Animation<double> _floatingAnimation;
 
   // ... existing initState and dispose methods ...
 
@@ -68,10 +67,6 @@ class _KurirHomePageState extends State<KurirHomePage>
     _fadeAnimation = CurvedAnimation(
       parent: _controller,
       curve: Curves.easeInOut,
-    );
-
-    _floatingAnimation = Tween<double>(begin: -10, end: 10).animate(
-      CurvedAnimation(parent: _floatingController, curve: Curves.easeInOut),
     );
 
     Future.delayed(const Duration(milliseconds: 600), () {

@@ -1078,7 +1078,7 @@ class _HistoryPageState extends State<HistoryPage>
                                 ),
                                 SizedBox(width: 8),
                                 Text(
-                                  'Lacak Pesanan',
+                                  'Lacak',
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
