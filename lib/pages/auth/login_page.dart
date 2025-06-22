@@ -195,7 +195,7 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 24),
                   TextButton(
                     onPressed: () {
-                      // TODO: Navigasi ke halaman register
+                      context.push('/register');
                     },
                     child: Text(
                       'Belum punya akun? Daftar',

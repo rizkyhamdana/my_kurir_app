@@ -630,8 +630,8 @@ class ProfilePage extends StatelessWidget {
                     margin: const EdgeInsets.only(bottom: 15),
                     decoration: BoxDecoration(
                       color: !isDarkMode
-                          ? const Color(0xFF3498db).withAlpha(60)
-                          : Colors.white.withAlpha(25),
+                          ? const Color(0xFF3498db).withOpacity(0.2)
+                          : Colors.white.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                         color: !isDarkMode
@@ -649,7 +649,7 @@ class ProfilePage extends StatelessWidget {
                             borderRadius: BorderRadius.circular(10),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withAlpha(25),
+                                color: Colors.black.withOpacity(0.1),
                                 blurRadius: 5,
                                 offset: const Offset(0, 2),
                               ),
@@ -681,8 +681,8 @@ class ProfilePage extends StatelessWidget {
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: isDarkMode
-                                      ? Colors.white.withAlpha(150)
-                                      : Colors.black87.withAlpha(150),
+                                      ? Colors.white.withOpacity(0.7)
+                                      : Colors.black87.withOpacity(0.7),
                                 ),
                               ),
                             ],
@@ -716,8 +716,8 @@ class ProfilePage extends StatelessWidget {
                     padding: const EdgeInsets.all(15),
                     decoration: BoxDecoration(
                       color: isDarkMode
-                          ? const Color(0xFFffd700).withAlpha(60)
-                          : Colors.black.withAlpha(18),
+                          ? const Color(0xFFffd700).withOpacity(0.2)
+                          : Colors.black.withOpacity(0.05),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                         color: isDarkMode
@@ -735,7 +735,7 @@ class ProfilePage extends StatelessWidget {
                             borderRadius: BorderRadius.circular(10),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withAlpha(60),
+                                color: Colors.black.withOpacity(0.2),
                                 blurRadius: 5,
                                 offset: const Offset(0, 2),
                               ),
@@ -767,8 +767,8 @@ class ProfilePage extends StatelessWidget {
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: isDarkMode
-                                      ? Colors.white.withAlpha(150)
-                                      : Colors.black87.withAlpha(150),
+                                      ? Colors.white.withOpacity(0.7)
+                                      : Colors.black87.withOpacity(0.7),
                                 ),
                               ),
                             ],

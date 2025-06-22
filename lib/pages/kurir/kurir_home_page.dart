@@ -12,11 +12,46 @@ class KurirHomePage extends StatefulWidget {
 class _KurirHomePageState extends State<KurirHomePage>
     with TickerProviderStateMixin {
   bool _isLoading = true;
+  bool _isOnline = true; // Status kurir: true = online, false = offline
+
   late AnimationController _controller;
   late AnimationController _floatingController;
   late Animation<double> _fadeAnimation;
-  late Animation<double> _slideAnimation;
   late Animation<double> _floatingAnimation;
+
+  // ... existing initState and dispose methods ...
+
+  // Method untuk toggle status
+  void _toggleStatus() {
+    setState(() {
+      _isOnline = !_isOnline;
+    }); // Show snackbar confirmation
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(
+              _isOnline ? Icons.check_circle : Icons.cancel,
+              color: Colors.white,
+            ),
+            const SizedBox(width: 10),
+            Text(
+              _isOnline
+                  ? 'Status: Online - Siap menerima pesanan'
+                  : 'Status: Offline - Tidak menerima pesanan',
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
+          ],
+        ),
+        backgroundColor: _isOnline
+            ? const Color(0xFF43e97b)
+            : const Color(0xFFf5576c),
+        duration: const Duration(seconds: 3),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
 
   @override
   void initState() {
@@ -33,13 +68,6 @@ class _KurirHomePageState extends State<KurirHomePage>
     _fadeAnimation = CurvedAnimation(
       parent: _controller,
       curve: Curves.easeInOut,
-    );
-    _slideAnimation = Tween<double>(
-      begin: 50,
-      end: 0,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.elasticOut));
-    _floatingAnimation = Tween<double>(begin: -10, end: 10).animate(
-      CurvedAnimation(parent: _floatingController, curve: Curves.easeInOut),
     );
 
     Future.delayed(const Duration(milliseconds: 600), () {
@@ -94,16 +122,11 @@ class _KurirHomePageState extends State<KurirHomePage>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Animated Header
-                        AnimatedBuilder(
-                          animation: _slideAnimation,
-                          builder: (context, child) {
-                            return Transform.translate(
-                              offset: Offset(0, _slideAnimation.value),
-                              child: _buildHeader(context),
-                            );
-                          },
-                        ),
+                        _buildHeader(context),
+
                         const SizedBox(height: 30),
+                        _buildStatusBanner(),
+                        const SizedBox(height: 20),
 
                         // Floating Hero Banner
                         AnimatedBuilder(
@@ -442,6 +465,89 @@ class _KurirHomePageState extends State<KurirHomePage>
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  // Status Banner Widget
+  Widget _buildStatusBanner() {
+    // final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final textColor =
+        Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white;
+
+    return GlassContainer(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      borderRadius: BorderRadius.circular(20),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color:
+                  (_isOnline
+                          ? const Color(0xFF43e97b)
+                          : const Color(0xFFf5576c))
+                      .withAlpha(51),
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: Icon(
+              _isOnline ? Icons.check_circle : Icons.cancel,
+              color: _isOnline
+                  ? const Color(0xFF43e97b)
+                  : const Color(0xFFf5576c),
+              size: 24,
+            ),
+          ),
+          const SizedBox(width: 15),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _isOnline ? 'Status: Online' : 'Status: Offline',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: textColor,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  _isOnline
+                      ? 'Siap menerima pesanan baru'
+                      : 'Tidak menerima pesanan',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: textColor.withAlpha(180),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          GestureDetector(
+            onTap: _toggleStatus,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: _isOnline
+                      ? [const Color(0xFFf5576c), const Color(0xFFf093fb)]
+                      : [const Color(0xFF43e97b), const Color(0xFF38f9d7)],
+                ),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                _isOnline ? 'Set Offline' : 'Set Online',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 12,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

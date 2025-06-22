@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:my_kurir_app/util/performace_util.dart';
 import '../../widgets/glass_container.dart';
 import 'dart:ui';
 
@@ -15,8 +16,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   late AnimationController _controller;
   late AnimationController _floatingController;
   late Animation<double> _fadeAnimation;
-  late Animation<double> _slideAnimation;
-  late Animation<double> _floatingAnimation;
 
   @override
   void initState() {
@@ -33,13 +32,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     _fadeAnimation = CurvedAnimation(
       parent: _controller,
       curve: Curves.easeInOut,
-    );
-    _slideAnimation = Tween<double>(
-      begin: 50,
-      end: 0,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.elasticOut));
-    _floatingAnimation = Tween<double>(begin: -10, end: 10).animate(
-      CurvedAnimation(parent: _floatingController, curve: Curves.easeInOut),
     );
 
     // Simulasi loading data
@@ -97,27 +89,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Animated Header
-                        AnimatedBuilder(
-                          animation: _slideAnimation,
-                          builder: (context, child) {
-                            return Transform.translate(
-                              offset: Offset(0, _slideAnimation.value),
-                              child: _buildHeader(),
-                            );
-                          },
-                        ),
+                        _buildHeader(),
                         const SizedBox(height: 30),
 
                         // Floating Hero Banner
-                        AnimatedBuilder(
-                          animation: _floatingAnimation,
-                          builder: (context, child) {
-                            return Transform.translate(
-                              offset: Offset(0, _floatingAnimation.value),
-                              child: _buildHeroBanner(),
-                            );
-                          },
-                        ),
+                        _buildHeroBanner(),
                         const SizedBox(height: 40),
 
                         // Quick Stats
@@ -331,7 +307,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       ),
       child: GlassContainer(
         width: double.infinity,
-        padding: const EdgeInsets.all(35),
+        padding: const EdgeInsets.all(24),
         borderRadius: BorderRadius.circular(30),
         child: Stack(
           children: [
@@ -516,12 +492,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 size: 12,
               ),
               const SizedBox(width: 8),
-              Text(
-                label,
-                style: TextStyle(
-                  color: isSecondary ? textColor : Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
+              Expanded(
+                child: Text(
+                  label,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: isSecondary ? textColor : Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
                 ),
               ),
             ],
@@ -716,94 +695,185 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     required VoidCallback onTap,
   }) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        height: 200,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(25),
-          boxShadow: [
-            BoxShadow(
-              color: (isDarkMode ? Colors.white : Colors.black).withAlpha(13),
-              blurRadius: 20,
-              offset: const Offset(0, 10),
-            ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(25),
-          child: Stack(
-            children: [
-              // Background gradient
-              Container(
-                decoration: BoxDecoration(
-                  gradient: gradient,
-                  borderRadius: BorderRadius.circular(25),
-                ),
-              ),
-              // Glass effect overlay
-              BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                child: Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withAlpha(26),
-                    borderRadius: BorderRadius.circular(25),
-                    border: Border.all(color: Colors.white.withAlpha(51)),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withAlpha(51),
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Icon(icon, color: Colors.white, size: 28),
-                      ),
-                      const Spacer(),
-                      Text(
-                        title,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      // Text(
-                      //   subtitle,
-                      //   style: TextStyle(
-                      //     fontSize: 14,
-                      //     color: Colors.white.withAlpha(204),
-                      //     fontWeight: FontWeight.w500,
-                      //   ),
-                      // ),
-                      // const SizedBox(height: 8),
-                      SizedBox(
-                        height: 40,
-                        child: Text(
-                          description,
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 2,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.white.withAlpha(179),
-                            height: 1.3,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+    final useSimple = PerformanceUtils.shouldUseSimpleGlass();
+    if (useSimple) {
+      return GestureDetector(
+        onTap: onTap,
+        child: Container(
+          height: 200,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(25),
+            boxShadow: [
+              BoxShadow(
+                color: gradient.colors.first.withAlpha(30),
+                blurRadius: 15,
+                offset: const Offset(0, 8),
               ),
             ],
           ),
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              gradient: gradient,
+              borderRadius: BorderRadius.circular(25),
+              border: Border.all(color: Colors.white.withAlpha(30), width: 1),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Icon Container
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withAlpha(40),
+                    borderRadius: BorderRadius.circular(15),
+                    border: Border.all(
+                      color: Colors.white.withAlpha(60),
+                      width: 1,
+                    ),
+                  ),
+                  child: Icon(icon, color: Colors.white, size: 28),
+                ),
+                const Spacer(),
+
+                // Title
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 5),
+
+                // Description
+                SizedBox(
+                  height: 40,
+                  child: Text(
+                    description,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.white.withAlpha(200),
+                      height: 1.3,
+                    ),
+                  ),
+                ),
+
+                // Arrow indicator
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withAlpha(30),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(
+                        Icons.arrow_forward_rounded,
+                        color: Colors.white,
+                        size: 16,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
         ),
-      ),
-    );
+      );
+    } else {
+      return GestureDetector(
+        onTap: onTap,
+        child: Container(
+          height: 200,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(25),
+            boxShadow: [
+              BoxShadow(
+                color: (isDarkMode ? Colors.white : Colors.black).withAlpha(13),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(25),
+            child: Stack(
+              children: [
+                // Background gradient
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: gradient,
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                ),
+                // Glass effect overlay
+                BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withAlpha(26),
+                      borderRadius: BorderRadius.circular(25),
+                      border: Border.all(color: Colors.white.withAlpha(51)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withAlpha(51),
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: Icon(icon, color: Colors.white, size: 28),
+                        ),
+                        const Spacer(),
+                        Text(
+                          title,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 5),
+                        // Text(
+                        //   subtitle,
+                        //   style: TextStyle(
+                        //     fontSize: 14,
+                        //     color: Colors.white.withAlpha(204),
+                        //     fontWeight: FontWeight.w500,
+                        //   ),
+                        // ),
+                        // const SizedBox(height: 8),
+                        SizedBox(
+                          height: 40,
+                          child: Text(
+                            description,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 2,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.white.withAlpha(179),
+                              height: 1.3,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
   }
 
   // Widget _buildFeaturesGrid() {

@@ -183,7 +183,7 @@ class _OrderPageState extends State<OrderPage> {
 
                         _buildModernTextField(
                           controller: _alamatJemputController,
-                          label: 'Alamat Jemput (Toko/Warung)',
+                          label: 'Alamat Jemput ',
                           icon: Icons.store_rounded,
                           hint: 'Contoh: Warung Bu Siti, Jl. Raya Desa',
                           maxLines: 2,
@@ -208,7 +208,7 @@ class _OrderPageState extends State<OrderPage> {
 
                         _buildModernTextField(
                           controller: _alamatAntarController,
-                          label: 'Alamat Antar (Rumah)',
+                          label: 'Alamat Antar',
                           icon: Icons.home_rounded,
                           hint: 'Contoh: Jl. Raya Desa No. 123',
                           maxLines: 2,
@@ -637,12 +637,15 @@ class _OrderPageState extends State<OrderPage> {
                 child: Icon(icon, color: const Color(0xFF00BCD4), size: 20),
               ),
               const SizedBox(width: 12),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: textColor,
+              Center(
+                child: Text(
+                  label,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: textColor,
+                  ),
                 ),
               ),
               if (onPickLocation != null) ...[

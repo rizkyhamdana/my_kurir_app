@@ -1,10 +1,12 @@
 import 'package:go_router/go_router.dart';
 import 'package:my_kurir_app/pages/auth/login_page.dart';
+import 'package:my_kurir_app/pages/auth/register_page.dart';
 import 'package:my_kurir_app/pages/history/history_page.dart';
 import 'package:my_kurir_app/pages/kurir/kurir_history_page.dart';
 import 'package:my_kurir_app/pages/kurir/kurir_home_page.dart';
 import 'package:my_kurir_app/pages/kurir/kurir_profile_page.dart';
 import 'package:my_kurir_app/pages/kurir/kurir_tracking_page.dart';
+import 'package:my_kurir_app/pages/onboarding/onboarding_page.dart';
 import '../pages/splashscreen/splashscreen_page.dart';
 import '../pages/home/home_page.dart';
 import '../pages/order/order_page.dart';
@@ -21,7 +23,15 @@ class AppRouter {
         path: '/splash',
         builder: (context, state) => const SplashScreenPage(),
       ),
+      GoRoute(
+        path: '/onboarding',
+        builder: (context, state) => const OnboardingPage(),
+      ),
       GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
+      GoRoute(
+        path: '/register',
+        builder: (context, state) => const RegisterPage(),
+      ),
       GoRoute(path: '/', redirect: (context, state) => '/home'),
       GoRoute(path: '/home', builder: (context, state) => const HomePage()),
       GoRoute(
