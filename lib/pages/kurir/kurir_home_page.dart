@@ -70,6 +70,10 @@ class _KurirHomePageState extends State<KurirHomePage>
       curve: Curves.easeInOut,
     );
 
+    _floatingAnimation = Tween<double>(begin: -10, end: 10).animate(
+      CurvedAnimation(parent: _floatingController, curve: Curves.easeInOut),
+    );
+
     Future.delayed(const Duration(milliseconds: 600), () {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -129,15 +133,8 @@ class _KurirHomePageState extends State<KurirHomePage>
                         const SizedBox(height: 20),
 
                         // Floating Hero Banner
-                        AnimatedBuilder(
-                          animation: _floatingAnimation,
-                          builder: (context, child) {
-                            return Transform.translate(
-                              offset: Offset(0, _floatingAnimation.value),
-                              child: _buildHeroBanner(context),
-                            );
-                          },
-                        ),
+                        _buildHeroBanner(context),
+
                         const SizedBox(height: 40),
 
                         // Quick Stats
