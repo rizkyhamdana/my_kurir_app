@@ -202,7 +202,7 @@ class _OrderPageState extends State<OrderPage> {
                               _jemputLatLng = picked;
                               // _alamatJemputController.text =
                               //     'Lat: ${picked.latitude}, Lng: ${picked.longitude}';
-                              // setState(() {});
+                              setState(() {});
                             }
                           },
                           trailing: _jemputLatLng != null
