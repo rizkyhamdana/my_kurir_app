@@ -157,7 +157,7 @@ class _TrackingPageState extends State<TrackingPage> {
                         Icon(
                           Icons.inbox_rounded,
                           size: 90,
-                          color: Colors.grey.withOpacity(0.3),
+                          color: Colors.grey.withAlpha(75),
                         ),
                         const SizedBox(height: 30),
                         Text(
@@ -713,6 +713,7 @@ class _TrackingPageState extends State<TrackingPage> {
                                 //   .collection('orders')
                                 //   .doc(currentOrder.id)
                                 //   .update({'status': 'cancelled'});
+                                if (!context.mounted) return;
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                     content: Text(
