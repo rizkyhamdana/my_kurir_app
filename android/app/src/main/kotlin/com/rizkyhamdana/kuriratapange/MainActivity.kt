@@ -1,4 +1,4 @@
-package com.example.my_kurir_app
+package com.rizkyhamdana.kuriratapange
 
 import io.flutter.embedding.android.FlutterActivity
 

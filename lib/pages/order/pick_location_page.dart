@@ -57,7 +57,7 @@ class _PickLocationPageState extends State<PickLocationPage> {
               children: [
                 TileLayer(
                   urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                  userAgentPackageName: 'com.example.app',
+                  userAgentPackageName: 'com.rizkyhamdana.kuriratapange',
                 ),
                 if (_pickedLatLng != null)
                   MarkerLayer(
