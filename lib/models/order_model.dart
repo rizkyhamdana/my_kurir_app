@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class OrderModel {
@@ -38,6 +39,74 @@ class OrderModel {
     required this.createdAt,
     this.status = OrderStatus.pending,
   });
+
+  /// Konversi dari Firestore
+  factory OrderModel.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+
+    DateTime? toDate(dynamic ts) {
+      if (ts == null) return null;
+      if (ts is Timestamp) return ts.toDate();
+      return DateTime.tryParse(ts.toString());
+    }
+
+    OrderStatus statusFromString(String? str) {
+      return OrderStatus.values.firstWhere(
+        (e) => e.name == str,
+        orElse: () => OrderStatus.pending,
+      );
+    }
+
+    return OrderModel(
+      id: doc.id,
+      nama: data['nama'] ?? '',
+      kurirName: data['kurirName'],
+      kurirPhone: data['kurirPhone'],
+      phone: data['phone'] ?? '',
+      alamatJemput: data['alamatJemput'] ?? '',
+      alamatAntar: data['alamatAntar'] ?? '',
+      jenisBarang: data['jenisBarang'] ?? '',
+      catatan: data['catatan'],
+      isUrgent: data['isUrgent'] ?? false,
+      createdAt: toDate(data['createdAt']) ?? DateTime.now(),
+      confirmedAt: toDate(data['confirmedAt']),
+      pickingUpAt: toDate(data['pickingUpAt']),
+      onTheWayAt: toDate(data['onTheWayAt']),
+      deliveredAt: toDate(data['deliveredAt']),
+      cancelledAt: toDate(data['cancelledAt']),
+      status: statusFromString(data['status']),
+    );
+  }
+
+  /// Konversi ke Firestore
+  Map<String, dynamic> toFirestore() {
+    return {
+      'nama': nama,
+      'kurirName': kurirName,
+      'kurirPhone': kurirPhone,
+      'phone': phone,
+      'alamatJemput': alamatJemput,
+      'alamatAntar': alamatAntar,
+      'jenisBarang': jenisBarang,
+      'catatan': catatan,
+      'isUrgent': isUrgent,
+      'createdAt': Timestamp.fromDate(createdAt),
+      'confirmedAt': confirmedAt != null
+          ? Timestamp.fromDate(confirmedAt!)
+          : null,
+      'pickingUpAt': pickingUpAt != null
+          ? Timestamp.fromDate(pickingUpAt!)
+          : null,
+      'onTheWayAt': onTheWayAt != null ? Timestamp.fromDate(onTheWayAt!) : null,
+      'deliveredAt': deliveredAt != null
+          ? Timestamp.fromDate(deliveredAt!)
+          : null,
+      'cancelledAt': cancelledAt != null
+          ? Timestamp.fromDate(cancelledAt!)
+          : null,
+      'status': status.name,
+    };
+  }
 
   int get totalCost {
     int baseCost = 3000; // Tarif dasar
