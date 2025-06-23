@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "294560235815",
+    "project_id": "mykurirapp",
+    "storage_bucket": "mykurirapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:294560235815:android:a5d3fe1f3c59989c2d6902",
+        "android_client_info": {
+          "package_name": "com.example.my_kurir_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB54-6VvXUn3vOBlgBMTdZiCYBIie_9FqY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
