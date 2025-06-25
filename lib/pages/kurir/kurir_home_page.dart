@@ -653,6 +653,7 @@ class _KurirHomePageState extends State<KurirHomePage>
       child: ElevatedButton(
         onPressed: onTap,
         style: ElevatedButton.styleFrom(
+          padding: EdgeInsets.all(0),
           backgroundColor: Colors.transparent,
           shadowColor: Colors.transparent,
           shape: RoundedRectangleBorder(

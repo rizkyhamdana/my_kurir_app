@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 	<dict>
+		<key>CADisableMinimumFrameDurationOnPhone</key>
+		<true />
 		<key>CFBundleDevelopmentRegion</key>
 		<string>$(DEVELOPMENT_LANGUAGE)</string>
 		<key>CFBundleDisplayName</key>
@@ -22,8 +24,28 @@
 		<string>????</string>
 		<key>CFBundleVersion</key>
 		<string>$(FLUTTER_BUILD_NUMBER)</string>
+		<key>FirebaseAppDelegateProxyEnabled</key>
+		<true />
 		<key>LSRequiresIPhoneOS</key>
 		<true />
+		<key>NSAppTransportSecurity</key>
+		<dict>
+			<key>NSAllowsArbitraryLoads</key>
+			<true />
+		</dict>
+		<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+		<string>Aplikasi membutuhkan akses lokasi untuk memilih titik penjemputan/antar di peta.</string>
+		<key>NSLocationWhenInUseUsageDescription</key>
+		<string>Aplikasi membutuhkan akses lokasi untuk memilih titik penjemputan/antar di peta.</string>
+		<key>UIApplicationSupportsIndirectInputEvents</key>
+		<true />
+		<key>UIBackgroundModes</key>
+		<array>
+			<string>remote-notification</string>
+			<string>processing</string>
+			<string>fetch</string>
+			<string>location</string>
+		</array>
 		<key>UILaunchStoryboardName</key>
 		<string>LaunchScreen</string>
 		<key>UIMainStoryboardFile</key>
@@ -41,18 +63,7 @@
 			<string>UIInterfaceOrientationLandscapeLeft</string>
 			<string>UIInterfaceOrientationLandscapeRight</string>
 		</array>
-		<key>CADisableMinimumFrameDurationOnPhone</key>
-		<true />
-		<key>UIApplicationSupportsIndirectInputEvents</key>
-		<true />
-		<key>NSAppTransportSecurity</key>
-		<dict>
-			<key>NSAllowsArbitraryLoads</key>
-			<true />
-		</dict>
-		<key>NSLocationWhenInUseUsageDescription</key>
-		<string>Aplikasi membutuhkan akses lokasi untuk memilih titik penjemputan/antar di peta.</string>
-		<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-		<string>Aplikasi membutuhkan akses lokasi untuk memilih titik penjemputan/antar di peta.</string>
+		<key>NSLocalNetworkUsageDescription</key>
+		<string>Aplikasi ini membutuhkan akses jaringan lokal untuk debug dan komunikasi perangkat.</string>
 	</dict>
 </plist>

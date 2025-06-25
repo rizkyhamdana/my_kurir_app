@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 
 class OrderModel {
   final String id;
+  final String userId;
+  final String? courierId;
   final String nama;
   final String? kurirName;
   final String? kurirPhone;
@@ -21,6 +23,8 @@ class OrderModel {
   final DateTime? cancelledAt;
 
   OrderModel({
+    required this.userId,
+    this.courierId,
     this.confirmedAt,
     this.pickingUpAt,
     this.onTheWayAt,
@@ -59,6 +63,8 @@ class OrderModel {
 
     return OrderModel(
       id: doc.id,
+      userId: data['userId'] ?? '',
+      courierId: data['courierId'],
       nama: data['nama'] ?? '',
       kurirName: data['kurirName'],
       kurirPhone: data['kurirPhone'],
@@ -132,6 +138,8 @@ class OrderModel {
   factory OrderModel.fromJson(Map<String, dynamic> json) {
     return OrderModel(
       id: json['id'],
+      userId: json['userId'],
+      courierId: json['courierId'],
       nama: json['nama'],
       phone: json['phone'],
       alamatJemput: json['alamatJemput'],

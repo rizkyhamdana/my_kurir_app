@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:my_kurir_app/util/session_manager.dart';
 import '../../models/order_model.dart';
 import '../../widgets/glass_container.dart';
 import 'dart:ui';
@@ -767,13 +768,15 @@ class _OrderPageState extends State<OrderPage> {
     );
   }
 
-  void _submitOrder() {
+  void _submitOrder() async {
     // final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final textColor =
         Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white;
 
     final order = OrderModel(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
+      userId: await SessionManager.getUserId() ?? '',
+      courierId: _selectedKurir ?? '',
       nama: _namaController.text,
       phone: _phoneController.text,
       alamatJemput: _alamatJemputController.text,

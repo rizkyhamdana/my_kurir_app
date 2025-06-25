@@ -77,13 +77,15 @@ class _OnboardingPageState extends State<OnboardingPage>
     _slideController.forward();
   }
 
-  void _nextPage() {
+  Future<void> _nextPage() async {
     if (_currentIndex < _onboardingData.length - 1) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
     } else {
+      if (!mounted) return;
+      await SessionManager.setOnboardingShown();
       if (!mounted) return;
       context.go('/login');
     }

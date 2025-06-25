@@ -48,6 +48,8 @@ class _HistoryPageState extends State<HistoryPage>
       OrderModel(
         nama: 'Pak Joko',
         phone: '081234567890',
+        userId: 'USR-001',
+        courierId: 'CRR-001',
         id: 'ORD-001',
         alamatJemput: 'Warung Bu Siti, Jl. Raya Desa No. 15',
         alamatAntar: 'Jl. Melati No. 8, RT 03/RW 01',
@@ -60,6 +62,8 @@ class _HistoryPageState extends State<HistoryPage>
       ),
       OrderModel(
         phone: '082345678901',
+        userId: 'USR-001',
+        courierId: 'CRR-001',
         nama: 'Ibu Ani',
         id: 'ORD-002',
         alamatJemput: 'Toko Kelontong Pak Joko, Jl. Mawar No. 20',

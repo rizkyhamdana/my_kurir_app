@@ -23,6 +23,8 @@ class _TrackingPageState extends State<TrackingPage> {
   late OrderModel _dummyOrder;
   final dummyOrderBisaDibatalkan = OrderModel(
     id: 'ORDER-001',
+    userId: 'USER-001',
+    courierId: 'COURIER-001',
     nama: 'Budi Santoso',
     phone: '+62 812-3456-7890',
     alamatJemput: 'Warung Bu Siti, Jl. Raya Desa No. 15, RT 01/RW 02',
@@ -42,6 +44,8 @@ class _TrackingPageState extends State<TrackingPage> {
 
   final dummyOrderTidakAdaPesanan = OrderModel(
     id: 'ORDER-002',
+    userId: 'USER-002',
+    courierId: 'COURIER-002',
     nama: 'Budi Santoso',
     phone: '+62 812-3456-7890',
     alamatJemput: 'Warung Bu Siti, Jl. Raya Desa No. 15, RT 01/RW 02',

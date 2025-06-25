@@ -5,6 +5,17 @@ class SessionManager {
   static const _keyRole = 'role';
   static const _keyLoginTimestamp = 'loginTimestamp';
   static const _keyOnboarding = 'isOnboardingShown';
+  static const _keyFcmToken = 'fcmToken';
+
+  static Future<void> saveFcmToken(String token) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyFcmToken, token);
+  }
+
+  static Future<String?> getFcmToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_keyFcmToken);
+  }
 
   static Future<bool> isOnboardingShown() async {
     final prefs = await SharedPreferences.getInstance();
@@ -45,8 +56,21 @@ class SessionManager {
   // Hapus session (logout)
   static Future<void> clearSession() async {
     final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_keyFcmToken);
     await prefs.remove(_keyUserId);
     await prefs.remove(_keyRole);
     await prefs.remove(_keyLoginTimestamp);
+  }
+
+  // Simpan userId
+  static Future<void> setUserId(String userId) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyUserId, userId);
+  }
+
+  // Ambil userId
+  static Future<String?> getUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_keyUserId);
   }
 }

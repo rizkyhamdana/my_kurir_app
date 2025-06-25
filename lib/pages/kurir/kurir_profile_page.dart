@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:my_kurir_app/main.dart';
@@ -930,10 +931,11 @@ class KurirProfilePage extends StatelessWidget {
                           borderRadius: BorderRadius.circular(15),
                         ),
                         child: ElevatedButton(
-                          onPressed: () {
+                          onPressed: () async {
                             Navigator.of(context).pop();
 
-                            SessionManager.clearSession();
+                            await SessionManager.clearSession();
+                            await FirebaseAuth.instance.signOut();
                             context.go('/login');
                           },
                           style: ElevatedButton.styleFrom(

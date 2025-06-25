@@ -45,7 +45,7 @@ class _SplashScreenPageState extends State<SplashScreenPage>
       if (!mounted) return;
       if (valid) {
         final role = await SessionManager.getRole();
-        if (role == 'kurir') {
+        if (role == 'courier') {
           if (!mounted) return;
           context.go('/kurir-home');
         } else {

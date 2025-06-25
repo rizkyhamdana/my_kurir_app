@@ -1,4 +1,11 @@
+import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:my_kurir_app/firebase_options.dart';
+import 'package:my_kurir_app/util/session_manager.dart';
 import 'package:my_kurir_app/util/theme_notifier.dart';
 import 'routes/app_router.dart';
 
@@ -7,7 +14,10 @@ final themeNotifier = ThemeNotifier();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize theme preferences
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  await setupFirebaseMessaging(); // ✅ Setup FCM aman Android/iOS
+
   await themeNotifier.initPrefs();
 
   runApp(
@@ -18,6 +28,60 @@ void main() async {
   );
 }
 
+Future<void> setupFirebaseMessaging() async {
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+  // Minta izin notifikasi
+  final settings = await messaging.requestPermission(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
+
+  if (settings.authorizationStatus == AuthorizationStatus.authorized ||
+      settings.authorizationStatus == AuthorizationStatus.provisional) {
+    if (Platform.isIOS || Platform.isMacOS) {
+      final apnsToken = await messaging.getAPNSToken();
+      print('📱 APNS Token: $apnsToken');
+
+      // 💡 Jangan panggil getToken kalau APNS token belum tersedia
+      if (apnsToken == null) {
+        print('⏳ APNS belum siap, tunda getToken.');
+        return;
+      }
+    }
+
+    // ✅ Aman untuk ambil FCM Token
+    final token = await messaging.getToken();
+    print('📦 FCM Token: $token');
+
+    if (token != null) {
+      await SessionManager.saveFcmToken(token);
+
+      final userId = await SessionManager.getUserId();
+      if (userId != null) {
+        await FirebaseFirestore.instance.collection('users').doc(userId).update(
+          {'fcmToken': token},
+        );
+      }
+    }
+
+    // Listener saat token diperbarui
+    FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
+      await SessionManager.saveFcmToken(newToken);
+
+      final userId = await SessionManager.getUserId();
+      if (userId != null) {
+        await FirebaseFirestore.instance.collection('users').doc(userId).update(
+          {'fcmToken': newToken},
+        );
+      }
+    });
+  } else {
+    print('🔒 Not authorized for notifications.');
+  }
+}
+
 class MainApp extends StatelessWidget {
   final ThemeMode themeMode;
   const MainApp({super.key, required this.themeMode});
@@ -26,143 +90,23 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp.router(
       title: 'Kurir Desa',
+      themeMode: themeMode,
       theme: ThemeData(
         brightness: Brightness.light,
-        scaffoldBackgroundColor: const Color(0xFFF8F9FB),
-        cardColor: Colors.white,
         primaryColor: const Color(0xFF4A80F0),
+        scaffoldBackgroundColor: const Color(0xFFF8F9FB),
         colorScheme: ColorScheme.light(
           primary: const Color(0xFF4A80F0),
           secondary: const Color(0xFF4A80F0).withAlpha(170),
-          surface: Colors.white,
-          onSurface: Colors.black87,
-        ),
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black87,
-          elevation: 0,
-          centerTitle: false,
-          titleTextStyle: TextStyle(
-            color: Colors.black87,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF4A80F0),
-            foregroundColor: Colors.white,
-            elevation: 0,
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-        ),
-        textTheme: const TextTheme(
-          headlineLarge: TextStyle(
-            color: Colors.black87,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
-          headlineMedium: TextStyle(
-            color: Colors.black87,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-          bodyLarge: TextStyle(color: Colors.black87, fontSize: 16),
-          bodyMedium: TextStyle(color: Colors.black87, fontSize: 14),
-        ),
-        inputDecorationTheme: InputDecorationTheme(
-          filled: true,
-          fillColor: Colors.white,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide(color: Colors.grey.shade300),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide(color: Colors.grey.shade300),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: const BorderSide(color: Color(0xFF4A80F0)),
-          ),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 14,
-          ),
         ),
       ),
-      darkTheme: ThemeData(
-        brightness: Brightness.dark,
-        scaffoldBackgroundColor: const Color(0xFF0A0E21),
-        cardColor: Colors.white.withAlpha(13),
+      darkTheme: ThemeData.dark().copyWith(
         primaryColor: const Color(0xFF4A80F0),
         colorScheme: ColorScheme.dark(
           primary: const Color(0xFF4A80F0),
           secondary: const Color(0xFF4A80F0).withAlpha(170),
-          surface: const Color(0xFF1D1E33),
-          onSurface: Colors.white,
-        ),
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.transparent,
-          foregroundColor: Colors.white,
-          elevation: 0,
-          centerTitle: false,
-          titleTextStyle: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF4A80F0),
-            foregroundColor: Colors.white,
-            elevation: 0,
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-        ),
-        textTheme: const TextTheme(
-          headlineLarge: TextStyle(
-            color: Colors.white,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
-          headlineMedium: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-          bodyLarge: TextStyle(color: Colors.white, fontSize: 16),
-          bodyMedium: TextStyle(color: Colors.white, fontSize: 14),
-        ),
-        inputDecorationTheme: InputDecorationTheme(
-          filled: true,
-          fillColor: const Color(0xFF1D1E33),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide.none,
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide.none,
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: const BorderSide(color: Color(0xFF4A80F0)),
-          ),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 14,
-          ),
         ),
       ),
-      themeMode: themeMode,
       routerConfig: AppRouter.router,
     );
   }

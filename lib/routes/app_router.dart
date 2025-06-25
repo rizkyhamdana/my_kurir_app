@@ -1,4 +1,6 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:my_kurir_app/pages/auth/cubit/auth_cubit.dart';
 import 'package:my_kurir_app/pages/auth/login_page.dart';
 import 'package:my_kurir_app/pages/auth/register_page.dart';
 import 'package:my_kurir_app/pages/history/history_page.dart';
@@ -27,10 +29,17 @@ class AppRouter {
         path: '/onboarding',
         builder: (context, state) => const OnboardingPage(),
       ),
-      GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
       GoRoute(
         path: '/register',
-        builder: (context, state) => const RegisterPage(),
+        builder: (context, state) => BlocProvider(
+          create: (_) => AuthCubit(),
+          child: const RegisterPage(),
+        ),
+      ),
+      GoRoute(
+        path: '/login',
+        builder: (context, state) =>
+            BlocProvider(create: (_) => AuthCubit(), child: const LoginPage()),
       ),
       GoRoute(path: '/', redirect: (context, state) => '/home'),
       GoRoute(path: '/home', builder: (context, state) => const HomePage()),
