@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:my_kurir_app/main.dart';
+import 'package:my_kurir_app/models/user_model.dart';
 import 'package:my_kurir_app/pages/auth/cubit/auth_cubit.dart';
 import 'package:my_kurir_app/util/session_manager.dart';
 import 'package:my_kurir_app/util/utility.dart';
@@ -14,10 +15,8 @@ class LoginPage extends StatefulWidget {
   State<LoginPage> createState() => _LoginPageState();
 }
 
-enum LoginRole { kurir, pelanggan }
-
 class _LoginPageState extends State<LoginPage> {
-  LoginRole _role = LoginRole.pelanggan;
+  UserRole _role = UserRole.customer; // Default ke Pelanggan
   final _formKey = GlobalKey<FormState>();
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -70,7 +69,7 @@ class _LoginPageState extends State<LoginPage> {
 
           await SessionManager.saveLoginSession(userId ?? '', role);
 
-          if (role == 'courier' || role == 'kurir') {
+          if (role == UserRole.courier.name) {
             if (!context.mounted) return;
             context.go('/kurir-home');
           } else {
@@ -137,14 +136,14 @@ class _LoginPageState extends State<LoginPage> {
                       children: [
                         _buildRoleButton(
                           context,
-                          LoginRole.pelanggan,
+                          UserRole.customer,
                           'Pelanggan',
                           Icons.person_rounded,
                         ),
                         const SizedBox(width: 16),
                         _buildRoleButton(
                           context,
-                          LoginRole.kurir,
+                          UserRole.courier,
                           'Kurir',
                           Icons.delivery_dining_rounded,
                         ),
@@ -234,7 +233,7 @@ class _LoginPageState extends State<LoginPage> {
                                       color: Colors.white,
                                     )
                                   : Text(
-                                      _role == LoginRole.kurir
+                                      _role == UserRole.courier
                                           ? 'Login sebagai Kurir'
                                           : 'Login sebagai Pelanggan',
                                       style: const TextStyle(
@@ -285,7 +284,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _buildRoleButton(
     BuildContext context,
-    LoginRole role,
+    UserRole role,
     String label,
     IconData icon,
   ) {
@@ -299,7 +298,7 @@ class _LoginPageState extends State<LoginPage> {
           decoration: BoxDecoration(
             gradient: isSelected
                 ? LinearGradient(
-                    colors: role == LoginRole.kurir
+                    colors: role == UserRole.courier
                         ? [const Color(0xFF43e97b), const Color(0xFF38f9d7)]
                         : [const Color(0xFF667eea), const Color(0xFF764ba2)],
                   )

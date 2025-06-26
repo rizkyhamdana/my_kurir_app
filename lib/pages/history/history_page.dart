@@ -45,36 +45,6 @@ class _HistoryPageState extends State<HistoryPage>
 
   void _initializeDummyData() {
     _historyOrders = [
-      OrderModel(
-        nama: 'Pak Joko',
-        phone: '081234567890',
-        userId: 'USR-001',
-        courierId: 'CRR-001',
-        id: 'ORD-001',
-        alamatJemput: 'Warung Bu Siti, Jl. Raya Desa No. 15',
-        alamatAntar: 'Jl. Melati No. 8, RT 03/RW 01',
-        jenisBarang: 'Makanan/Minuman',
-        catatan: 'Sudah dibayar via transfer',
-        isUrgent: false,
-        createdAt: DateTime.now().subtract(const Duration(days: 2)),
-        status: OrderStatus.delivered,
-        kurirName: 'Pak Budi',
-      ),
-      OrderModel(
-        phone: '082345678901',
-        userId: 'USR-001',
-        courierId: 'CRR-001',
-        nama: 'Ibu Ani',
-        id: 'ORD-002',
-        alamatJemput: 'Toko Kelontong Pak Joko, Jl. Mawar No. 20',
-        alamatAntar: 'Jl. Anggrek No. 12, RT 02/RW 03',
-        jenisBarang: 'Kebutuhan Harian',
-        catatan: 'Tolong beli sabun cuci dan deterjen',
-        isUrgent: true,
-        createdAt: DateTime.now().subtract(const Duration(days: 5)),
-        status: OrderStatus.delivered,
-        kurirName: 'Mas Joko',
-      ),
       // ...tambahkan data lain sesuai kebutuhan
     ];
   }
@@ -166,7 +136,7 @@ class _HistoryPageState extends State<HistoryPage>
                         child: Text(
                           'Riwayat Pesanan',
                           style: TextStyle(
-                            fontSize: 24,
+                            fontSize: 20,
                             fontWeight: FontWeight.bold,
                             color: textColor,
                           ),
@@ -631,41 +601,41 @@ class _HistoryPageState extends State<HistoryPage>
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 30),
-            Container(
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF43e97b), Color(0xFF38f9d7)],
-                ),
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: ElevatedButton(
-                onPressed: () => context.push('/order'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
-                  shadowColor: Colors.transparent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                ),
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.add_rounded, color: Colors.white),
-                      SizedBox(width: 8),
-                      Text(
-                        'Pesan Sekarang',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+            // Container(
+            //   decoration: BoxDecoration(
+            //     gradient: const LinearGradient(
+            //       colors: [Color(0xFF43e97b), Color(0xFF38f9d7)],
+            //     ),
+            //     borderRadius: BorderRadius.circular(15),
+            //   ),
+            //   child: ElevatedButton(
+            //     onPressed: () => context.push('/order'),
+            //     style: ElevatedButton.styleFrom(
+            //       backgroundColor: Colors.transparent,
+            //       shadowColor: Colors.transparent,
+            //       shape: RoundedRectangleBorder(
+            //         borderRadius: BorderRadius.circular(15),
+            //       ),
+            //     ),
+            //     child: const Padding(
+            //       padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            //       child: Row(
+            //         mainAxisSize: MainAxisSize.min,
+            //         children: [
+            //           Icon(Icons.add_rounded, color: Colors.white),
+            //           SizedBox(width: 8),
+            //           Text(
+            //             'Pesan Sekarang',
+            //             style: TextStyle(
+            //               color: Colors.white,
+            //               fontWeight: FontWeight.bold,
+            //             ),
+            //           ),
+            //         ],
+            //       ),
+            //     ),
+            //   ),
+            // ),
           ],
         ),
       ),

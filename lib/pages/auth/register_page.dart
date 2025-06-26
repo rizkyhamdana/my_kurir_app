@@ -52,15 +52,12 @@ class _RegisterPageState extends State<RegisterPage> {
     final phone = _phoneController.text.trim();
     final alamat = _alamatController.text.trim();
     final password = _passwordController.text.trim();
-    final role = 'courier'; // Atau sesuai pilihan user
-
     // Panggil cubit
     context.read<AuthCubit>().registerWithPhone(
       phone: phone,
       password: password,
       name: name,
       address: alamat,
-      role: role,
     );
   }
 

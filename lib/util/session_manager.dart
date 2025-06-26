@@ -56,7 +56,6 @@ class SessionManager {
   // Hapus session (logout)
   static Future<void> clearSession() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_keyFcmToken);
     await prefs.remove(_keyUserId);
     await prefs.remove(_keyRole);
     await prefs.remove(_keyLoginTimestamp);

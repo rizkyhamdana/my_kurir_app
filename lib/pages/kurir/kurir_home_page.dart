@@ -110,7 +110,8 @@ class _KurirHomePageState extends State<KurirHomePage>
     if (result == true) {
       await SessionManager.clearSession();
       if (mounted) {
-        Navigator.of(context).pop(); // keluar dari halaman home
+        SessionManager.clearSession();
+        context.go('/login');
       }
       return false; // jangan pop otomatis, sudah di-handle
     }

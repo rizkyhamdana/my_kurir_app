@@ -21,6 +21,11 @@ class OrderModel {
   final DateTime? onTheWayAt;
   final DateTime? deliveredAt;
   final DateTime? cancelledAt;
+  final String? latJemput;
+  final String? lngJemput;
+  final String? latAntar;
+  final String? lngAntar;
+  final int? total;
 
   OrderModel({
     required this.userId,
@@ -30,6 +35,10 @@ class OrderModel {
     this.onTheWayAt,
     this.deliveredAt,
     this.cancelledAt,
+    this.latJemput,
+    this.lngJemput,
+    this.latAntar,
+    this.lngAntar,
     required this.id,
     required this.nama,
     this.kurirName,
@@ -42,6 +51,7 @@ class OrderModel {
     required this.isUrgent,
     required this.createdAt,
     this.status = OrderStatus.pending,
+    this.total,
   });
 
   /// Konversi dari Firestore
@@ -72,6 +82,10 @@ class OrderModel {
       alamatJemput: data['alamatJemput'] ?? '',
       alamatAntar: data['alamatAntar'] ?? '',
       jenisBarang: data['jenisBarang'] ?? '',
+      latJemput: data['latJemput'],
+      lngJemput: data['lngJemput'],
+      latAntar: data['latAntar'],
+      lngAntar: data['lngAntar'],
       catatan: data['catatan'],
       isUrgent: data['isUrgent'] ?? false,
       createdAt: toDate(data['createdAt']) ?? DateTime.now(),
@@ -81,6 +95,7 @@ class OrderModel {
       deliveredAt: toDate(data['deliveredAt']),
       cancelledAt: toDate(data['cancelledAt']),
       status: statusFromString(data['status']),
+      total: data['total'] != null ? (data['total'] as num).toInt() : null,
     );
   }
 
@@ -97,6 +112,12 @@ class OrderModel {
       'catatan': catatan,
       'isUrgent': isUrgent,
       'createdAt': Timestamp.fromDate(createdAt),
+      'userId': userId,
+      'courierId': courierId,
+      'latJemput': latJemput,
+      'lngJemput': lngJemput,
+      'latAntar': latAntar,
+      'lngAntar': lngAntar,
       'confirmedAt': confirmedAt != null
           ? Timestamp.fromDate(confirmedAt!)
           : null,
@@ -111,6 +132,7 @@ class OrderModel {
           ? Timestamp.fromDate(cancelledAt!)
           : null,
       'status': status.name,
+      'total': total ?? 0,
     };
   }
 

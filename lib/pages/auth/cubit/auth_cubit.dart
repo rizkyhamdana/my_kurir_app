@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_kurir_app/models/user_model.dart';
 import 'package:my_kurir_app/util/session_manager.dart';
 import 'package:my_kurir_app/util/utility.dart';
 
@@ -21,7 +22,6 @@ class AuthCubit extends Cubit<AuthState> {
     required String name,
     required String
     address, // alamat tidak digunakan di sini, tapi bisa disimpan di Firestore jika perlu
-    required String role, // 'customer' atau 'courier'
   }) async {
     emit(AuthLoading());
     try {
@@ -31,19 +31,27 @@ class AuthCubit extends Cubit<AuthState> {
             email: email,
             password: password, // dari input user
           );
-      final savedToken = await SessionManager.getFcmToken();
       final userId = userCredential.user?.uid;
 
-      await FirebaseFirestore.instance.collection('users').doc(userId).set({
-        'name': name,
-        'role': role,
-        'phone': phone,
-        'fcmToken': savedToken,
-        'address': address,
-        'currentOrderId': null,
-        'location': null,
-        'createdAt': FieldValue.serverTimestamp(),
-      });
+      if (userId != null) {
+        final userModel = UserModel(
+          id: userId,
+          name: name,
+          email: email,
+          phone: phone,
+          role: UserRole.courier, // ← ini enum-nya
+          fcmToken: await SessionManager.getFcmToken(),
+          location: null,
+
+          createdAt: DateTime.now(),
+          lastLogin: DateTime.now(),
+        );
+
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userId)
+            .set(userModel.toFirestore());
+      }
 
       emit(AuthSuccess(userCredential.user));
     } on FirebaseAuthException catch (e, stackTrace) {
@@ -68,20 +76,30 @@ class AuthCubit extends Cubit<AuthState> {
       );
       // Cek role user di Firestore
       final userId = userCredential.user?.uid;
-      final userDoc = await FirebaseFirestore.instance
+      final userDocRef = FirebaseFirestore.instance
           .collection('users')
-          .doc(userId)
-          .get();
+          .doc(userId);
+      final userDoc = await userDocRef.get();
       final role = userDoc['role'] ?? 'customer';
-
+      print('User role: $role');
+      print('Expected role: $expectedRole');
+      print('User Role Courier: ${UserRole.courier.name}');
+      print('User Role Customer: ${UserRole.customer.name}');
       // Validasi role jika perlu
-      if ((expectedRole == 'kurir' && role != 'courier' && role != 'kurir') ||
-          (expectedRole == 'pelanggan' &&
-              role != 'customer' &&
-              role != 'pelanggan')) {
+      if ((expectedRole == UserRole.courier.name &&
+              role != UserRole.courier.name) ||
+          (expectedRole == UserRole.customer.name &&
+              role != UserRole.customer.name)) {
         emit(AuthFailure('Role akun tidak sesuai'));
         return;
       }
+
+      final fcmToken = await SessionManager.getFcmToken();
+      await userDocRef.update({
+        'fcmToken': fcmToken,
+        'lastLogin': DateTime.now(),
+        'isOnline': true,
+      });
 
       emit(AuthSuccess(userCredential.user));
     } on FirebaseAuthException catch (e) {

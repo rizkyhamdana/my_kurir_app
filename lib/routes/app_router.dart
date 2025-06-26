@@ -9,17 +9,22 @@ import 'package:my_kurir_app/pages/kurir/kurir_home_page.dart';
 import 'package:my_kurir_app/pages/kurir/kurir_profile_page.dart';
 import 'package:my_kurir_app/pages/kurir/kurir_tracking_page.dart';
 import 'package:my_kurir_app/pages/onboarding/onboarding_page.dart';
+import 'package:my_kurir_app/pages/order/cubit/order_cubit.dart';
+import 'package:my_kurir_app/pages/profile/cubit/profile_cubit.dart';
+import 'package:my_kurir_app/pages/tracking/cubit/tracking_cubit.dart';
+import 'package:my_kurir_app/routes/route_logger.dart';
 import '../pages/splashscreen/splashscreen_page.dart';
 import '../pages/home/home_page.dart';
 import '../pages/order/order_page.dart';
 import '../pages/order/pick_location_page.dart';
-import '../pages/profile/tracking_page.dart';
-import '../pages/tracking/profile_page.dart';
+import '../pages/tracking/tracking_page.dart';
+import '../pages/profile/profile_page.dart';
 import '../models/order_model.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
     initialLocation: '/splash',
+    observers: [RouteLogger()],
     routes: [
       GoRoute(
         path: '/splash',
@@ -47,7 +52,13 @@ class AppRouter {
         path: '/history',
         builder: (context, state) => const HistoryPage(),
       ),
-      GoRoute(path: '/order', builder: (context, state) => const OrderPage()),
+      GoRoute(
+        path: '/order',
+        builder: (context, state) => BlocProvider(
+          create: (context) => OrderCubit(),
+          child: const OrderPage(),
+        ),
+      ),
       GoRoute(
         path: '/pick-location',
         builder: (context, state) => const PickLocationPage(),
@@ -56,7 +67,10 @@ class AppRouter {
         path: '/tracking',
         builder: (context, state) {
           final orderData = state.extra as OrderModel?;
-          return TrackingPage(orderData: orderData);
+          return BlocProvider(
+            create: (context) => TrackingCubit(),
+            child: TrackingPage(orderData: orderData),
+          );
         },
       ),
       GoRoute(
@@ -77,7 +91,10 @@ class AppRouter {
       ),
       GoRoute(
         path: '/profile',
-        builder: (context, state) => const ProfilePage(),
+        builder: (context, state) => BlocProvider(
+          create: (context) => ProfileCubit(),
+          child: const ProfilePage(),
+        ),
       ),
     ],
   );

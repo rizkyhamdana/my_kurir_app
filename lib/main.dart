@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:my_kurir_app/firebase_options.dart';
 import 'package:my_kurir_app/util/session_manager.dart';
 import 'package:my_kurir_app/util/theme_notifier.dart';
@@ -17,6 +18,10 @@ void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   await setupFirebaseMessaging(); // ✅ Setup FCM aman Android/iOS
+  if (Platform.isAndroid || Platform.isLinux) {
+    // Hanya perlu setup notifikasi lokal di Android/Linux
+    await setupFlutterLocalNotifications(); // ✅ Setup notifikasi lokal
+  }
 
   await themeNotifier.initPrefs();
 
@@ -26,6 +31,19 @@ void main() async {
       builder: (context, mode, _) => MainApp(themeMode: mode),
     ),
   );
+}
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+
+Future<void> setupFlutterLocalNotifications() async {
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('@drawable/ic_stat_notification');
+  const InitializationSettings initializationSettings = InitializationSettings(
+    android: initializationSettingsAndroid,
+  );
+
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
 }
 
 Future<void> setupFirebaseMessaging() async {
@@ -74,6 +92,24 @@ Future<void> setupFirebaseMessaging() async {
       if (userId != null) {
         await FirebaseFirestore.instance.collection('users').doc(userId).update(
           {'fcmToken': newToken},
+        );
+      }
+    });
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      if (message.notification != null) {
+        flutterLocalNotificationsPlugin.show(
+          0,
+          message.notification!.title,
+          message.notification!.body,
+          const NotificationDetails(
+            android: AndroidNotificationDetails(
+              'default_channel', // channel id
+              'Notifikasi', // channel name
+              importance: Importance.max,
+              priority: Priority.high,
+            ),
+          ),
         );
       }
     });
