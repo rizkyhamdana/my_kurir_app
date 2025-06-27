@@ -1,13 +1,26 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:my_kurir_app/main.dart';
+import 'package:my_kurir_app/pages/kurir/profile/cubit/kurir_profile_cubit.dart';
 import 'package:my_kurir_app/util/session_manager.dart';
 import '../../../widgets/glass_container.dart';
 import 'dart:ui';
 
-class KurirProfilePage extends StatelessWidget {
+class KurirProfilePage extends StatefulWidget {
   const KurirProfilePage({super.key});
+
+  @override
+  State<KurirProfilePage> createState() => _KurirProfilePageState();
+}
+
+class _KurirProfilePageState extends State<KurirProfilePage> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<KurirProfileCubit>().fetchProfile();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,177 +88,203 @@ class KurirProfilePage extends StatelessWidget {
                   child: Column(
                     children: [
                       // Profile Header
-                      GlassContainer(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(30),
-                        child: Column(
-                          children: [
-                            Container(
-                              width: 100,
-                              height: 100,
-                              decoration: BoxDecoration(
-                                gradient: const LinearGradient(
-                                  colors: [
-                                    Color(0xFF43e97b),
-                                    Color(0xFF38f9d7),
-                                  ],
-                                ),
-                                borderRadius: BorderRadius.circular(30),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: const Color(
-                                      0xFF43e97b,
-                                    ).withAlpha(77),
-                                    blurRadius: 20,
-                                    offset: const Offset(0, 10),
+                      BlocBuilder<KurirProfileCubit, KurirProfileState>(
+                        builder: (context, state) {
+                          print('State: $state');
+                          if (state is KurirProfileLoading) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+                          if (state is KurirProfileFailure) {
+                            return Center(child: Text(state.message));
+                          }
+                          if (state is KurirProfileLoaded) {
+                            return GlassContainer(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(30),
+                              child: Column(
+                                children: [
+                                  Container(
+                                    width: 100,
+                                    height: 100,
+                                    decoration: BoxDecoration(
+                                      gradient: const LinearGradient(
+                                        colors: [
+                                          Color(0xFF43e97b),
+                                          Color(0xFF38f9d7),
+                                        ],
+                                      ),
+                                      borderRadius: BorderRadius.circular(30),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: const Color(
+                                            0xFF43e97b,
+                                          ).withAlpha(77),
+                                          blurRadius: 20,
+                                          offset: const Offset(0, 10),
+                                        ),
+                                      ],
+                                    ),
+                                    child: ImageIcon(
+                                      const AssetImage(
+                                        'assets/ic_transparent_bg.png',
+                                      ),
+                                      size: 50,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 25),
+                                  Text(
+                                    state.user.name,
+                                    style: TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                      color: isDarkMode
+                                          ? Colors.white
+                                          : Colors.black87,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    state.user.phone,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: isDarkMode
+                                          ? Colors.white.withAlpha(179)
+                                          : Colors.black87.withAlpha(179),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 18),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 15,
+                                      vertical: 8,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: state.user.isOnline
+                                          ? Color(0xFF43e97b).withAlpha(51)
+                                          : Color(0xFFF44336).withAlpha(51),
+                                      borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(
+                                        color: state.user.isOnline
+                                            ? Color(0xFF43e97b).withAlpha(77)
+                                            : Color(0xFFF44336).withAlpha(77),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      state.user.isOnline
+                                          ? 'Aktif'
+                                          : 'Tidak Aktif',
+                                      style: TextStyle(
+                                        color: state.user.isOnline
+                                            ? Color(0xFF43e97b)
+                                            : Colors.red,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),
-                              child: const Icon(
-                                Icons.delivery_dining_rounded,
-                                size: 50,
-                                color: Colors.white,
-                              ),
-                            ),
-                            const SizedBox(height: 25),
-                            Text(
-                              'Ahmad Kurniawan',
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: isDarkMode
-                                    ? Colors.white
-                                    : Colors.black87,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              '0812-3456-7890',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: isDarkMode
-                                    ? Colors.white.withAlpha(179)
-                                    : Colors.black87.withAlpha(179),
-                              ),
-                            ),
-                            const SizedBox(height: 18),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 15,
-                                vertical: 8,
-                              ),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF43e97b).withAlpha(51),
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                  color: const Color(0xFF43e97b).withAlpha(77),
-                                ),
-                              ),
-                              child: const Text(
-                                '🚀 Aktif • Kurir Atapange',
-                                style: TextStyle(
-                                  color: Color(0xFF43e97b),
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                            );
+                          }
+                          return const SizedBox();
+                        },
                       ),
                       const SizedBox(height: 30),
 
-                      // Statistics Card
-                      GlassContainer(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(25),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    gradient: const LinearGradient(
-                                      colors: [
-                                        Color(0xFF4facfe),
-                                        Color(0xFF00f2fe),
-                                      ],
-                                    ),
-                                    borderRadius: BorderRadius.circular(15),
-                                  ),
-                                  child: const Icon(
-                                    Icons.analytics_rounded,
-                                    color: Colors.white,
-                                    size: 24,
-                                  ),
-                                ),
-                                const SizedBox(width: 15),
-                                Text(
-                                  'Statistik Hari Ini',
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color: isDarkMode
-                                        ? Colors.white
-                                        : Colors.black87,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 20),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: _buildStatItem(
-                                    context,
-                                    '12',
-                                    'Pesanan Selesai',
-                                    Icons.check_circle_rounded,
-                                    const Color(0xFF43e97b),
-                                  ),
-                                ),
-                                const SizedBox(width: 15),
-                                Expanded(
-                                  child: _buildStatItem(
-                                    context,
-                                    '3',
-                                    'Dalam Perjalanan',
-                                    Icons.local_shipping_rounded,
-                                    const Color(0xFF4facfe),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 15),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: _buildStatItem(
-                                    context,
-                                    'Rp 150K',
-                                    'Pendapatan',
-                                    Icons.account_balance_wallet_rounded,
-                                    const Color(0xFFffd700),
-                                  ),
-                                ),
-                                const SizedBox(width: 15),
-                                Expanded(
-                                  child: _buildStatItem(
-                                    context,
-                                    '4.8⭐',
-                                    'Rating',
-                                    Icons.star_rounded,
-                                    const Color(0xFFf093fb),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 30),
+                      // // Statistics Card
+                      // GlassContainer(
+                      //   width: double.infinity,
+                      //   padding: const EdgeInsets.all(25),
+                      //   child: Column(
+                      //     crossAxisAlignment: CrossAxisAlignment.start,
+                      //     children: [
+                      //       Row(
+                      //         children: [
+                      //           Container(
+                      //             padding: const EdgeInsets.all(12),
+                      //             decoration: BoxDecoration(
+                      //               gradient: const LinearGradient(
+                      //                 colors: [
+                      //                   Color(0xFF4facfe),
+                      //                   Color(0xFF00f2fe),
+                      //                 ],
+                      //               ),
+                      //               borderRadius: BorderRadius.circular(15),
+                      //             ),
+                      //             child: const Icon(
+                      //               Icons.analytics_rounded,
+                      //               color: Colors.white,
+                      //               size: 24,
+                      //             ),
+                      //           ),
+                      //           const SizedBox(width: 15),
+                      //           Text(
+                      //             'Statistik Hari Ini',
+                      //             style: TextStyle(
+                      //               fontSize: 20,
+                      //               fontWeight: FontWeight.bold,
+                      //               color: isDarkMode
+                      //                   ? Colors.white
+                      //                   : Colors.black87,
+                      //             ),
+                      //           ),
+                      //         ],
+                      //       ),
+                      //       const SizedBox(height: 20),
+                      //       Row(
+                      //         children: [
+                      //           Expanded(
+                      //             child: _buildStatItem(
+                      //               context,
+                      //               '12',
+                      //               'Pesanan Selesai',
+                      //               Icons.check_circle_rounded,
+                      //               const Color(0xFF43e97b),
+                      //             ),
+                      //           ),
+                      //           const SizedBox(width: 15),
+                      //           Expanded(
+                      //             child: _buildStatItem(
+                      //               context,
+                      //               '3',
+                      //               'Dalam Perjalanan',
+                      //               Icons.local_shipping_rounded,
+                      //               const Color(0xFF4facfe),
+                      //             ),
+                      //           ),
+                      //         ],
+                      //       ),
+                      //       const SizedBox(height: 15),
+                      //       Row(
+                      //         children: [
+                      //           Expanded(
+                      //             child: _buildStatItem(
+                      //               context,
+                      //               'Rp 150K',
+                      //               'Pendapatan',
+                      //               Icons.account_balance_wallet_rounded,
+                      //               const Color(0xFFffd700),
+                      //             ),
+                      //           ),
+                      //           const SizedBox(width: 15),
+                      //           Expanded(
+                      //             child: _buildStatItem(
+                      //               context,
+                      //               '4.8⭐',
+                      //               'Rating',
+                      //               Icons.star_rounded,
+                      //               const Color(0xFFf093fb),
+                      //             ),
+                      //           ),
+                      //         ],
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
+                      // const SizedBox(height: 30),
 
                       // Menu Items
                       // _buildModernMenuItem(

@@ -64,7 +64,8 @@ class UserModel {
       role: _stringToRole(data['role']),
       fcmToken: data['fcmToken'],
       location: data['location'],
-      lastLocationUpdated: data['lastLocationUpdated'],
+      lastLocationUpdated: (data['lastLocationUpdated'] as Timestamp?)
+          ?.toDate(),
       lastLogin: (data['lastLogin'] as Timestamp?)?.toDate(),
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       isOnline: data['isOnline'] ?? true,

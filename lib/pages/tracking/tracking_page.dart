@@ -398,8 +398,10 @@ class _TrackingPageState extends State<TrackingPage> {
                                       ),
                                       borderRadius: BorderRadius.circular(20),
                                     ),
-                                    child: const Icon(
-                                      Icons.delivery_dining_rounded,
+                                    child: ImageIcon(
+                                      const AssetImage(
+                                        'assets/ic_transparent_bg.png',
+                                      ),
                                       size: 40,
                                       color: Colors.white,
                                     ),

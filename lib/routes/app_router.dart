@@ -5,10 +5,13 @@ import 'package:my_kurir_app/pages/auth/login_page.dart';
 import 'package:my_kurir_app/pages/auth/register_page.dart';
 import 'package:my_kurir_app/pages/history/cubit/history_cubit.dart';
 import 'package:my_kurir_app/pages/history/history_page.dart';
+import 'package:my_kurir_app/pages/kurir/history/cubit/kurir_history_cubit.dart';
 import 'package:my_kurir_app/pages/kurir/history/kurir_history_page.dart';
 import 'package:my_kurir_app/pages/kurir/home/cubit/kurir_home_cubit.dart';
 import 'package:my_kurir_app/pages/kurir/home/kurir_home_page.dart';
+import 'package:my_kurir_app/pages/kurir/profile/cubit/kurir_profile_cubit.dart';
 import 'package:my_kurir_app/pages/kurir/profile/kurir_profile_page.dart';
+import 'package:my_kurir_app/pages/kurir/tracking/cubit/kurir_tracking_cubit.dart';
 import 'package:my_kurir_app/pages/kurir/tracking/kurir_tracking_page.dart';
 import 'package:my_kurir_app/pages/onboarding/onboarding_page.dart';
 import 'package:my_kurir_app/pages/order/cubit/order_cubit.dart';
@@ -87,15 +90,24 @@ class AppRouter {
       ),
       GoRoute(
         path: '/kurir-tracking',
-        builder: (context, state) => const KurirTrackingPage(),
+        builder: (context, state) => BlocProvider(
+          create: (_) => KurirTrackingCubit(),
+          child: const KurirTrackingPage(),
+        ),
       ),
       GoRoute(
         path: '/kurir-history',
-        builder: (context, state) => const KurirHistoryPage(),
+        builder: (context, state) => BlocProvider(
+          create: (context) => KurirHistoryCubit(),
+          child: const KurirHistoryPage(),
+        ),
       ),
       GoRoute(
         path: '/kurir-profile',
-        builder: (context, state) => const KurirProfilePage(),
+        builder: (context, state) => BlocProvider(
+          create: (context) => KurirProfileCubit(),
+          child: const KurirProfilePage(),
+        ),
       ),
       GoRoute(
         path: '/profile',

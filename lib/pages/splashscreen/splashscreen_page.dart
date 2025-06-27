@@ -112,8 +112,8 @@ class _SplashScreenPageState extends State<SplashScreenPage>
                           ],
                         ),
                         padding: const EdgeInsets.all(22),
-                        child: const Icon(
-                          Icons.delivery_dining_rounded,
+                        child: const ImageIcon(
+                          AssetImage('assets/ic_transparent_bg.png'),
                           size: 40,
                           color: Colors.white,
                         ),

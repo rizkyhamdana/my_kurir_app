@@ -1,10 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../widgets/glass_container.dart';
 import 'dart:ui';
+import 'package:url_launcher/url_launcher.dart';
+import '../../../models/order_model.dart';
+import 'cubit/kurir_history_cubit.dart';
 
-class KurirHistoryPage extends StatelessWidget {
+class KurirHistoryPage extends StatefulWidget {
   const KurirHistoryPage({super.key});
+
+  @override
+  State<KurirHistoryPage> createState() => _KurirHistoryPageState();
+}
+
+class _KurirHistoryPageState extends State<KurirHistoryPage> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<KurirHistoryCubit>().fetchHistory();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,22 +76,11 @@ class KurirHistoryPage extends StatelessWidget {
                         ),
                       ),
                     ),
-                    // Filter Button
-                    GlassContainer(
-                      width: 50,
-                      height: 50,
-                      padding: const EdgeInsets.all(12),
-                      child: Icon(
-                        Icons.filter_list_rounded,
-                        color: isDarkMode ? Colors.white : Colors.black87,
-                        size: 24,
-                      ),
-                    ),
                   ],
                 ),
               ),
 
-              // Statistics Summary
+              // Statistik summary (opsional, bisa diambil dari state jika ingin dinamis)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: GlassContainer(
@@ -113,15 +117,28 @@ class KurirHistoryPage extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 4),
-                            Text(
-                              '127 Pesanan',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: isDarkMode
-                                    ? Colors.white
-                                    : Colors.black87,
-                              ),
+                            BlocBuilder<KurirHistoryCubit, KurirHistoryState>(
+                              builder: (context, state) {
+                                if (state is KurirHistoryLoaded) {
+                                  final selesai = state.orders
+                                      .where(
+                                        (o) =>
+                                            o.status == OrderStatus.delivered,
+                                      )
+                                      .length;
+                                  return Text(
+                                    '$selesai Pesanan',
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: isDarkMode
+                                          ? Colors.white
+                                          : Colors.black87,
+                                    ),
+                                  );
+                                }
+                                return const Text('-');
+                              },
                             ),
                           ],
                         ),
@@ -135,14 +152,33 @@ class KurirHistoryPage extends StatelessWidget {
                           color: const Color(0xFF43e97b).withAlpha(51),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Text(
-                          '+12 Hari ini',
-                          style: TextStyle(
-                            color: Color(0xFF43e97b),
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                        child:
+                            BlocBuilder<KurirHistoryCubit, KurirHistoryState>(
+                              builder: (context, state) {
+                                if (state is KurirHistoryLoaded) {
+                                  final hariIni = state.orders
+                                      .where(
+                                        (o) =>
+                                            o.status == OrderStatus.delivered &&
+                                            o.deliveredAt != null &&
+                                            DateTime.now()
+                                                    .difference(o.deliveredAt!)
+                                                    .inDays ==
+                                                0,
+                                      )
+                                      .length;
+                                  return Text(
+                                    '+$hariIni Hari ini',
+                                    style: const TextStyle(
+                                      color: Color(0xFF43e97b),
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  );
+                                }
+                                return const Text('');
+                              },
+                            ),
                       ),
                     ],
                   ),
@@ -153,226 +189,250 @@ class KurirHistoryPage extends StatelessWidget {
 
               // History List
               Expanded(
-                child: ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  itemCount: _getHistoryData().length,
-                  itemBuilder: (context, index) {
-                    final historyItem = _getHistoryData()[index];
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 15),
-                      child: GlassContainer(
-                        padding: const EdgeInsets.all(20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
+                child: BlocBuilder<KurirHistoryCubit, KurirHistoryState>(
+                  builder: (context, state) {
+                    if (state is KurirHistoryLoading) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    if (state is KurirHistoryFailure) {
+                      return Center(child: Text(state.message));
+                    }
+                    if (state is KurirHistoryLoaded) {
+                      if (state.orders.isEmpty) {
+                        return const Center(
+                          child: Text('Belum ada riwayat pesanan.'),
+                        );
+                      }
+                      return ListView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        itemCount: state.orders.length,
+                        itemBuilder: (context, index) {
+                          final order = state.orders[index];
+                          return GlassContainer(
+                            padding: const EdgeInsets.all(20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Container(
-                                  padding: const EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors:
-                                          historyItem['gradient']
-                                              as List<Color>,
-                                    ),
-                                    borderRadius: BorderRadius.circular(15),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color:
-                                            (historyItem['gradient']
-                                                    as List<Color>)
-                                                .first
-                                                .withAlpha(77),
-                                        blurRadius: 10,
-                                        offset: const Offset(0, 5),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Icon(
-                                    historyItem['icon'] as IconData,
-                                    color: Colors.white,
-                                    size: 24,
-                                  ),
-                                ),
-                                const SizedBox(width: 15),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        historyItem['title'] as String,
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16,
-                                          color: isDarkMode
-                                              ? Colors.white
-                                              : Colors.black87,
+                                Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(12),
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          colors:
+                                              order.status ==
+                                                  OrderStatus.delivered
+                                              ? [
+                                                  const Color(0xFF43e97b),
+                                                  const Color(0xFF38f9d7),
+                                                ]
+                                              : [
+                                                  const Color(0xFFf093fb),
+                                                  const Color(0xFFf5576c),
+                                                ],
                                         ),
+                                        borderRadius: BorderRadius.circular(15),
                                       ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        historyItem['orderId'] as String,
-                                        style: TextStyle(
-                                          color: isDarkMode
-                                              ? Colors.white.withAlpha(179)
-                                              : Colors.black87.withAlpha(179),
-                                          fontSize: 14,
-                                        ),
+                                      child: Icon(
+                                        order.status == OrderStatus.delivered
+                                            ? Icons.check_circle_rounded
+                                            : Icons.cancel_rounded,
+                                        color: Colors.white,
+                                        size: 24,
                                       ),
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 6,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: (historyItem['statusColor'] as Color)
-                                        .withAlpha(51),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Text(
-                                    historyItem['status'] as String,
-                                    style: TextStyle(
-                                      color:
-                                          historyItem['statusColor'] as Color,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
                                     ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 15),
-                            Container(
-                              padding: const EdgeInsets.all(15),
-                              decoration: BoxDecoration(
-                                color: isDarkMode
-                                    ? Colors.white.withAlpha(13)
-                                    : Colors.black.withAlpha(5),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Column(
-                                children: [
-                                  _buildDetailRow(
-                                    context,
-                                    Icons.location_on_rounded,
-                                    'Alamat',
-                                    historyItem['address'] as String,
-                                  ),
-                                  const SizedBox(height: 10),
-                                  _buildDetailRow(
-                                    context,
-                                    Icons.schedule_rounded,
-                                    'Waktu Selesai',
-                                    historyItem['completedTime'] as String,
-                                  ),
-                                  const SizedBox(height: 10),
-                                  _buildDetailRow(
-                                    context,
-                                    Icons.account_balance_wallet_rounded,
-                                    'Pendapatan',
-                                    historyItem['earning'] as String,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: 15),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Container(
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                      color: isDarkMode
-                                          ? Colors.white.withAlpha(26)
-                                          : Colors.black.withAlpha(10),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: ElevatedButton.icon(
-                                      onPressed: () {
-                                        _showOrderDetails(context, historyItem);
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.transparent,
-                                        shadowColor: Colors.transparent,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            12,
+                                    const SizedBox(width: 15),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            order.status ==
+                                                    OrderStatus.delivered
+                                                ? 'Pesanan Selesai'
+                                                : 'Pesanan Dibatalkan',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16,
+                                              color: isDarkMode
+                                                  ? Colors.white
+                                                  : Colors.black87,
+                                            ),
                                           ),
-                                        ),
-                                      ),
-                                      icon: Icon(
-                                        Icons.visibility_rounded,
-                                        color: isDarkMode
-                                            ? Colors.white
-                                            : Colors.black87,
-                                        size: 18,
-                                      ),
-                                      label: Text(
-                                        'Detail',
-                                        style: TextStyle(
-                                          color: isDarkMode
-                                              ? Colors.white
-                                              : Colors.black87,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: Container(
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                      gradient: const LinearGradient(
-                                        colors: [
-                                          Color(0xFF4facfe),
-                                          Color(0xFF00f2fe),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            order.id,
+                                            style: TextStyle(
+                                              color: isDarkMode
+                                                  ? Colors.white.withAlpha(179)
+                                                  : Colors.black87.withAlpha(
+                                                      179,
+                                                    ),
+                                              fontSize: 14,
+                                            ),
+                                          ),
                                         ],
                                       ),
-                                      borderRadius: BorderRadius.circular(12),
                                     ),
-                                    child: ElevatedButton.icon(
-                                      onPressed: () {
-                                        _showContactCustomer(
-                                          context,
-                                          historyItem,
-                                        );
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.transparent,
-                                        shadowColor: Colors.transparent,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                        ),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 6,
                                       ),
-                                      icon: const Icon(
-                                        Icons.phone_rounded,
-                                        color: Colors.white,
-                                        size: 18,
+                                      decoration: BoxDecoration(
+                                        color: order.status.color.withAlpha(51),
+                                        borderRadius: BorderRadius.circular(12),
                                       ),
-                                      label: const Text(
-                                        'Hubungi',
+                                      child: Text(
+                                        order.status.displayName,
                                         style: TextStyle(
-                                          color: Colors.white,
+                                          color: order.status.color,
+                                          fontSize: 12,
                                           fontWeight: FontWeight.w600,
                                         ),
                                       ),
                                     ),
+                                  ],
+                                ),
+                                const SizedBox(height: 15),
+                                Container(
+                                  padding: const EdgeInsets.all(15),
+                                  decoration: BoxDecoration(
+                                    color: isDarkMode
+                                        ? Colors.white.withAlpha(13)
+                                        : Colors.black.withAlpha(5),
+                                    borderRadius: BorderRadius.circular(12),
                                   ),
+                                  child: Column(
+                                    children: [
+                                      _buildDetailRow(
+                                        context,
+                                        Icons.location_on_rounded,
+                                        'Alamat Antar',
+                                        order.alamatAntar,
+                                      ),
+                                      const SizedBox(height: 10),
+                                      _buildDetailRow(
+                                        context,
+                                        Icons.schedule_rounded,
+                                        'Waktu Selesai',
+                                        order.deliveredAt != null
+                                            ? _formatDateTime(
+                                                order.deliveredAt!,
+                                              )
+                                            : (order.cancelledAt != null
+                                                  ? _formatDateTime(
+                                                      order.cancelledAt!,
+                                                    )
+                                                  : '-'),
+                                      ),
+                                      const SizedBox(height: 10),
+                                      _buildDetailRow(
+                                        context,
+                                        Icons.account_balance_wallet_rounded,
+                                        'Pendapatan',
+                                        'Rp ${order.total ?? 0}',
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 15),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Container(
+                                        height: 40,
+                                        decoration: BoxDecoration(
+                                          color: isDarkMode
+                                              ? Colors.white.withAlpha(26)
+                                              : Colors.black.withAlpha(10),
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                        child: ElevatedButton.icon(
+                                          onPressed: () =>
+                                              _showOrderDetails(context, order),
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.transparent,
+                                            shadowColor: Colors.transparent,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                            ),
+                                          ),
+                                          icon: Icon(
+                                            Icons.visibility_rounded,
+                                            color: isDarkMode
+                                                ? Colors.white
+                                                : Colors.black87,
+                                            size: 18,
+                                          ),
+                                          label: Text(
+                                            'Detail',
+                                            style: TextStyle(
+                                              color: isDarkMode
+                                                  ? Colors.white
+                                                  : Colors.black87,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: Container(
+                                        height: 40,
+                                        decoration: BoxDecoration(
+                                          gradient: const LinearGradient(
+                                            colors: [
+                                              Color(0xFF4facfe),
+                                              Color(0xFF00f2fe),
+                                            ],
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                        child: ElevatedButton.icon(
+                                          onPressed: () => _showContactCustomer(
+                                            context,
+                                            order,
+                                          ),
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.transparent,
+                                            shadowColor: Colors.transparent,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                            ),
+                                          ),
+                                          icon: const Icon(
+                                            Icons.phone_rounded,
+                                            color: Colors.white,
+                                            size: 18,
+                                          ),
+                                          label: const Text(
+                                            'Hubungi',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
-                          ],
-                        ),
-                      ),
-                    );
+                          );
+                        },
+                      );
+                    }
+                    return const SizedBox();
                   },
                 ),
               ),
@@ -390,7 +450,6 @@ class KurirHistoryPage extends StatelessWidget {
     String value,
   ) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
     return Row(
       children: [
         Icon(
@@ -424,80 +483,12 @@ class KurirHistoryPage extends StatelessWidget {
     );
   }
 
-  List<Map<String, dynamic>> _getHistoryData() {
-    return [
-      {
-        'title': 'Pesanan Selesai #001',
-        'orderId': 'ORD-2025-001',
-        'address': 'Jl. Merdeka No. 123, Atapange',
-        'completedTime': '21 Jan 2025, 14:30',
-        'earning': 'Rp 15.000',
-        'status': 'Selesai',
-        'statusColor': const Color(0xFF43e97b),
-        'icon': Icons.check_circle_rounded,
-        'gradient': [const Color(0xFF43e97b), const Color(0xFF38f9d7)],
-        'customerName': 'Ibu Sari',
-        'customerPhone': '0812-3456-7890',
-      },
-      {
-        'title': 'Pesanan Selesai #002',
-        'orderId': 'ORD-2025-002',
-        'address': 'Jl. Sudirman No. 45, Atapange',
-        'completedTime': '21 Jan 2025, 13:15',
-        'earning': 'Rp 12.000',
-        'status': 'Selesai',
-
-        'statusColor': const Color(0xFF43e97b),
-        'icon': Icons.check_circle_rounded,
-        'gradient': [const Color(0xFF43e97b), const Color(0xFF38f9d7)],
-        'customerName': 'Pak Budi',
-        'customerPhone': '0813-4567-8901',
-      },
-      {
-        'title': 'Pesanan Dibatalkan #003',
-        'orderId': 'ORD-2025-003',
-        'address': 'Jl. Diponegoro No. 78, Atapange',
-        'completedTime': '20 Jan 2025, 16:45',
-        'earning': 'Rp 0',
-        'status': 'Dibatalkan',
-        'statusColor': const Color(0xFFf5576c),
-        'icon': Icons.cancel_rounded,
-        'gradient': [const Color(0xFFf093fb), const Color(0xFFf5576c)],
-        'customerName': 'Ibu Rina',
-        'customerPhone': '0814-5678-9012',
-      },
-      {
-        'title': 'Pesanan Selesai #004',
-        'orderId': 'ORD-2025-004',
-        'address': 'Jl. Ahmad Yani No. 90, Atapange',
-        'completedTime': '20 Jan 2025, 11:20',
-        'earning': 'Rp 18.000',
-        'status': 'Selesai',
-        'statusColor': const Color(0xFF43e97b),
-        'icon': Icons.check_circle_rounded,
-        'gradient': [const Color(0xFF43e97b), const Color(0xFF38f9d7)],
-        'customerName': 'Pak Ahmad',
-        'customerPhone': '0815-6789-0123',
-      },
-      {
-        'title': 'Pesanan Selesai #005',
-        'orderId': 'ORD-2025-005',
-        'address': 'Jl. Kartini No. 12, Atapange',
-        'completedTime': '19 Jan 2025, 15:30',
-        'earning': 'Rp 10.000',
-        'status': 'Selesai',
-        'statusColor': const Color(0xFF43e97b),
-        'icon': Icons.check_circle_rounded,
-        'gradient': [const Color(0xFF43e97b), const Color(0xFF38f9d7)],
-        'customerName': 'Ibu Maya',
-        'customerPhone': '0816-7890-1234',
-      },
-    ];
+  String _formatDateTime(DateTime dateTime) {
+    return '${dateTime.day}/${dateTime.month} ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
   }
 
-  void _showOrderDetails(BuildContext context, Map<String, dynamic> order) {
+  void _showOrderDetails(BuildContext context, OrderModel order) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
     showDialog(
       context: context,
       builder: (context) => BackdropFilter(
@@ -513,12 +504,16 @@ class KurirHistoryPage extends StatelessWidget {
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: order['gradient'] as List<Color>,
+                      colors: order.status == OrderStatus.delivered
+                          ? [const Color(0xFF43e97b), const Color(0xFF38f9d7)]
+                          : [const Color(0xFFf093fb), const Color(0xFFf5576c)],
                     ),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Icon(
-                    order['icon'] as IconData,
+                    order.status == OrderStatus.delivered
+                        ? Icons.check_circle_rounded
+                        : Icons.cancel_rounded,
                     color: Colors.white,
                     size: 40,
                   ),
@@ -539,37 +534,48 @@ class KurirHistoryPage extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        _buildDetailItem(context, 'ID Pesanan', order.id),
+                        _buildDetailItem(context, 'Pelanggan', order.nama),
+                        _buildDetailItem(context, 'No. Telepon', order.phone),
                         _buildDetailItem(
                           context,
-                          'ID Pesanan',
-                          order['orderId'],
+                          'Alamat Jemput',
+                          order.alamatJemput,
                         ),
                         _buildDetailItem(
                           context,
-                          'Pelanggan',
-                          order['customerName'],
+                          'Alamat Antar',
+                          order.alamatAntar,
                         ),
                         _buildDetailItem(
                           context,
-                          'No. Telepon',
-                          order['customerPhone'],
+                          'Jenis Barang',
+                          order.jenisBarang,
                         ),
                         _buildDetailItem(
                           context,
-                          'Alamat Tujuan',
-                          order['address'],
+                          'Catatan',
+                          order.catatan ?? '-',
                         ),
                         _buildDetailItem(
                           context,
                           'Waktu Selesai',
-                          order['completedTime'],
+                          order.deliveredAt != null
+                              ? _formatDateTime(order.deliveredAt!)
+                              : (order.cancelledAt != null
+                                    ? _formatDateTime(order.cancelledAt!)
+                                    : '-'),
                         ),
                         _buildDetailItem(
                           context,
                           'Pendapatan',
-                          order['earning'],
+                          'Rp ${order.total ?? 0}',
                         ),
-                        _buildDetailItem(context, 'Status', order['status']),
+                        _buildDetailItem(
+                          context,
+                          'Status',
+                          order.status.displayName,
+                        ),
                       ],
                     ),
                   ),
@@ -613,7 +619,6 @@ class KurirHistoryPage extends StatelessWidget {
 
   Widget _buildDetailItem(BuildContext context, String label, String value) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
@@ -646,9 +651,8 @@ class KurirHistoryPage extends StatelessWidget {
     );
   }
 
-  void _showContactCustomer(BuildContext context, Map<String, dynamic> order) {
+  void _showContactCustomer(BuildContext context, OrderModel order) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
     showDialog(
       context: context,
       builder: (context) => BackdropFilter(
@@ -685,7 +689,7 @@ class KurirHistoryPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 15),
                 Text(
-                  order['customerName'],
+                  order.nama,
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
@@ -694,7 +698,7 @@ class KurirHistoryPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  order['customerPhone'],
+                  order.phone,
                   style: TextStyle(
                     fontSize: 16,
                     color: isDarkMode
@@ -717,7 +721,7 @@ class KurirHistoryPage extends StatelessWidget {
                         child: ElevatedButton.icon(
                           onPressed: () {
                             Navigator.of(context).pop();
-                            // TODO: Implement WhatsApp call
+                            _whatsappCustomer(order.phone);
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.transparent,
@@ -755,7 +759,7 @@ class KurirHistoryPage extends StatelessWidget {
                         child: ElevatedButton.icon(
                           onPressed: () {
                             Navigator.of(context).pop();
-                            // TODO: Implement phone call
+                            _callCustomer(order.phone);
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.transparent,
@@ -817,5 +821,20 @@ class KurirHistoryPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _whatsappCustomer(String phone) async {
+    final wa = phone.replaceAll(RegExp(r'^0'), '62');
+    final uri = Uri.parse('https://wa.me/$wa');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
+  void _callCustomer(String phone) async {
+    final uri = Uri.parse('tel:$phone');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    }
   }
 }

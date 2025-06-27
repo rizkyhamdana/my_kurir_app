@@ -117,9 +117,9 @@ class _LoginPageState extends State<LoginPage> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
-                      Icons.delivery_dining_rounded,
-                      size: 60,
+                    ImageIcon(
+                      const AssetImage('assets/ic_transparent_bg.png'),
+                      size: 70,
                       color: isDarkMode
                           ? const Color(0xFF43e97b)
                           : const Color(0xFF667eea),

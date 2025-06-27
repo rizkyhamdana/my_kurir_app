@@ -482,8 +482,8 @@ class _HistoryPageState extends State<HistoryPage>
               if (order.kurirName != null)
                 Row(
                   children: [
-                    const Icon(
-                      Icons.delivery_dining_rounded,
+                    const ImageIcon(
+                      const AssetImage('assets/ic_transparent_bg.png'),
                       size: 16,
                       color: Color(0xFF43e97b),
                     ),

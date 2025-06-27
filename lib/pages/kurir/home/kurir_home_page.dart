@@ -307,8 +307,8 @@ class _KurirHomePageState extends State<KurirHomePage>
                 ),
               ],
             ),
-            child: const Icon(
-              Icons.delivery_dining_rounded,
+            child: ImageIcon(
+              const AssetImage('assets/ic_transparent_bg.png'),
               size: 50,
               color: Colors.white,
             ),
@@ -496,8 +496,8 @@ class _KurirHomePageState extends State<KurirHomePage>
                           ),
                         ],
                       ),
-                      child: const Icon(
-                        Icons.delivery_dining_rounded,
+                      child: ImageIcon(
+                        const AssetImage('assets/ic_transparent_bg.png'),
                         size: 35,
                         color: Colors.white,
                       ),
