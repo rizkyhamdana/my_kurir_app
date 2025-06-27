@@ -58,4 +58,21 @@ class TrackingCubit extends Cubit<TrackingState> {
       emit(TrackingFailure('Gagal membatalkan pesanan'));
     }
   }
+
+  Future<void> completeOrder(String orderId) async {
+    emit(TrackingLoading());
+    try {
+      await FirebaseFirestore.instance
+          .collection('orders')
+          .doc(orderId)
+          .update({
+            'status': OrderStatus.delivered.name,
+            'deliveredAt': FieldValue.serverTimestamp(),
+          });
+      await fetchActiveOrder();
+    } catch (e, stackTrace) {
+      print('Error completing order: $e\n$stackTrace');
+      emit(TrackingFailure('Gagal menyelesaikan pesanan'));
+    }
+  }
 }

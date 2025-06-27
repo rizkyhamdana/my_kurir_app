@@ -18,7 +18,7 @@ class TrackingPage extends StatefulWidget {
 
 class _TrackingPageState extends State<TrackingPage> {
   InAppWebViewController? webViewController;
-  final String url = "http://localhost:3000";
+  final String url = "https://kurir-tracking.vercel.app/";
   bool isLoading = true;
   String? errorMessage;
 
@@ -62,16 +62,153 @@ class _TrackingPageState extends State<TrackingPage> {
     return BlocBuilder<TrackingCubit, TrackingState>(
       builder: (context, state) {
         if (state is TrackingFailure) {
-          return Center(child: Text(state.message));
+          return Scaffold(
+            backgroundColor: isDarkMode
+                ? const Color(0xFF0A0E21)
+                : const Color(0xFFF8F9FB),
+            body: SafeArea(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () => context.pop(),
+                          child: GlassContainer(
+                            width: 50,
+                            height: 50,
+                            padding: const EdgeInsets.all(12),
+                            child: Icon(
+                              Icons.arrow_back_rounded,
+                              color: textColor,
+                              size: 24,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 20),
+                        Expanded(
+                          child: Text(
+                            'Lacak Kurir Atapange',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: textColor,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 50),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.error_outline_rounded,
+                            color: Colors.redAccent.withAlpha(180),
+                            size: 60,
+                          ),
+                          const SizedBox(height: 20),
+                          Text(
+                            'Gagal memuat pesanan aktif',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: textColor,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            state.message,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: textColor.withAlpha(150),
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 30),
+                          ElevatedButton.icon(
+                            icon: const Icon(Icons.refresh_rounded),
+                            label: const Text('Coba Lagi'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF667eea),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 14,
+                                horizontal: 24,
+                              ),
+                            ),
+                            onPressed: () {
+                              context.read<TrackingCubit>().fetchActiveOrder();
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
         }
         if (state is TrackingLoading || state is TrackingInitial) {
-          return const Center(child: CircularProgressIndicator());
+          return Scaffold(
+            backgroundColor: isDarkMode
+                ? const Color(0xFF0A0E21)
+                : const Color(0xFFF8F9FB),
+            body: SafeArea(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () => context.pop(),
+                          child: GlassContainer(
+                            width: 50,
+                            height: 50,
+                            padding: const EdgeInsets.all(12),
+                            child: Icon(
+                              Icons.arrow_back_rounded,
+                              color: textColor,
+                              size: 24,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 20),
+                        Expanded(
+                          child: Text(
+                            'Lacak Kurir Atapange',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: textColor,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 50),
+                      ],
+                    ),
+                  ),
+                  const Expanded(
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        color: Color(0xFF00BCD4),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
         }
         if (state is TrackingNoActiveOrder) {
-          final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-          final textColor =
-              Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white;
-
           return Scaffold(
             backgroundColor: isDarkMode
                 ? const Color(0xFF0A0E21)
@@ -146,35 +283,7 @@ class _TrackingPageState extends State<TrackingPage> {
                               ),
                               textAlign: TextAlign.center,
                             ),
-                            const SizedBox(height: 32),
-                            ElevatedButton.icon(
-                              icon: const Icon(
-                                Icons.add_shopping_cart_rounded,
-                                color: Colors.white,
-                              ),
-                              label: const Text(
-                                'Buat Pesanan Baru',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF667eea),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(15),
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 16,
-                                  horizontal: 24,
-                                ),
-                              ),
-                              onPressed: () {
-                                context.pushReplacement(
-                                  '/order',
-                                ); // Ganti '/order' sesuai rute halaman order Anda
-                              },
-                            ),
+                            const SizedBox(height: 64),
                           ],
                         ),
                       ),
@@ -332,7 +441,9 @@ class _TrackingPageState extends State<TrackingPage> {
                                     else
                                       InAppWebView(
                                         initialUrlRequest: URLRequest(
-                                          url: WebUri(url),
+                                          url: WebUri(
+                                            '$url/track/${currentOrder.id}',
+                                          ),
                                         ),
                                         initialSettings: InAppWebViewSettings(
                                           useShouldOverrideUrlLoading: false,
@@ -664,23 +775,93 @@ class _TrackingPageState extends State<TrackingPage> {
                             const SizedBox(height: 15),
 
                             // Tombol Batalkan Pesanan (hanya jika status pending)
-                            if (currentOrder.status == OrderStatus.pending)
+                            // if (currentOrder.status == OrderStatus.pending)
+                            //   SizedBox(
+                            //     width: double.infinity,
+                            //     child: ElevatedButton.icon(
+                            //       icon: const Icon(
+                            //         Icons.cancel_rounded,
+                            //         color: Colors.white,
+                            //       ),
+                            //       label: const Text(
+                            //         'Batalkan Pesanan',
+                            //         style: TextStyle(
+                            //           color: Colors.white,
+                            //           fontWeight: FontWeight.bold,
+                            //         ),
+                            //       ),
+                            //       style: ElevatedButton.styleFrom(
+                            //         backgroundColor: const Color(0xFFf5576c),
+                            //         shape: RoundedRectangleBorder(
+                            //           borderRadius: BorderRadius.circular(15),
+                            //         ),
+                            //         padding: const EdgeInsets.symmetric(
+                            //           vertical: 16,
+                            //         ),
+                            //       ),
+                            //       onPressed: () async {
+                            //         final confirm = await showDialog<bool>(
+                            //           context: context,
+                            //           builder: (context) => AlertDialog(
+                            //             title: const Text(
+                            //               'Konfirmasi Pembatalan',
+                            //             ),
+                            //             content: const Text(
+                            //               'Yakin ingin membatalkan pesanan ini?',
+                            //             ),
+                            //             actions: [
+                            //               TextButton(
+                            //                 onPressed: () => Navigator.of(
+                            //                   context,
+                            //                 ).pop(false),
+                            //                 child: const Text('Batal'),
+                            //               ),
+                            //               TextButton(
+                            //                 onPressed: () =>
+                            //                     Navigator.of(context).pop(true),
+                            //                 child: const Text('Ya, Batalkan'),
+                            //               ),
+                            //             ],
+                            //           ),
+                            //         );
+                            //         if (confirm == true) {
+                            //           if (!context.mounted) return;
+                            //           await context
+                            //               .read<TrackingCubit>()
+                            //               .cancelOrder(currentOrder.id);
+                            //           if (!context.mounted) return;
+                            //           ScaffoldMessenger.of(
+                            //             context,
+                            //           ).showSnackBar(
+                            //             const SnackBar(
+                            //               content: Text(
+                            //                 'Pesanan berhasil dibatalkan.',
+                            //               ),
+                            //               backgroundColor: Color(0xFFf5576c),
+                            //             ),
+                            //           );
+                            //           // Tidak perlu popUntil, UI akan otomatis refresh
+                            //         }
+                            //       },
+                            //     ),
+                            //   ),
+                            if (currentOrder.status == OrderStatus.onTheWay)
                               SizedBox(
                                 width: double.infinity,
                                 child: ElevatedButton.icon(
                                   icon: const Icon(
-                                    Icons.cancel_rounded,
+                                    Icons.check_circle_rounded,
                                     color: Colors.white,
                                   ),
                                   label: const Text(
-                                    'Batalkan Pesanan',
+                                    'Selesaikan Pesanan',
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFFf5576c),
+                                    backgroundColor: const Color(0xFF43e97b),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(15),
                                     ),
@@ -692,11 +873,9 @@ class _TrackingPageState extends State<TrackingPage> {
                                     final confirm = await showDialog<bool>(
                                       context: context,
                                       builder: (context) => AlertDialog(
-                                        title: const Text(
-                                          'Konfirmasi Pembatalan',
-                                        ),
+                                        title: const Text('Konfirmasi Selesai'),
                                         content: const Text(
-                                          'Yakin ingin membatalkan pesanan ini?',
+                                          'Yakin ingin menyelesaikan pesanan ini?',
                                         ),
                                         actions: [
                                           TextButton(
@@ -708,28 +887,26 @@ class _TrackingPageState extends State<TrackingPage> {
                                           TextButton(
                                             onPressed: () =>
                                                 Navigator.of(context).pop(true),
-                                            child: const Text('Ya, Batalkan'),
+                                            child: const Text('Ya, Selesaikan'),
                                           ),
                                         ],
                                       ),
                                     );
                                     if (confirm == true) {
-                                      if (!context.mounted) return;
                                       await context
                                           .read<TrackingCubit>()
-                                          .cancelOrder(currentOrder.id);
+                                          .completeOrder(currentOrder.id);
                                       if (!context.mounted) return;
                                       ScaffoldMessenger.of(
                                         context,
                                       ).showSnackBar(
                                         const SnackBar(
                                           content: Text(
-                                            'Pesanan berhasil dibatalkan.',
+                                            'Pesanan telah diselesaikan.',
                                           ),
-                                          backgroundColor: Color(0xFFf5576c),
+                                          backgroundColor: Color(0xFF43e97b),
                                         ),
                                       );
-                                      // Tidak perlu popUntil, UI akan otomatis refresh
                                     }
                                   },
                                 ),
@@ -925,7 +1102,7 @@ class _TrackingPageState extends State<TrackingPage> {
             ),
             const SizedBox(height: 20),
             Text(
-              'Gagal memuat peta',
+              'Fitur tracking belum tersedia',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -933,11 +1110,11 @@ class _TrackingPageState extends State<TrackingPage> {
               ),
             ),
             const SizedBox(height: 10),
-            Text(
-              errorMessage ?? 'Terjadi kesalahan',
-              style: TextStyle(fontSize: 14, color: textColor.withAlpha(150)),
-              textAlign: TextAlign.center,
-            ),
+            // Text(
+            //   errorMessage ?? 'Terjadi kesalahan',
+            //   style: TextStyle(fontSize: 14, color: textColor.withAlpha(150)),
+            //   textAlign: TextAlign.center,
+            // ),
             const SizedBox(height: 20),
             Container(
               decoration: BoxDecoration(
@@ -1138,6 +1315,7 @@ class _TrackingPageState extends State<TrackingPage> {
       errorMessage = null;
     });
     webViewController?.reload();
+    context.read<TrackingCubit>().fetchActiveOrder();
   }
 
   void _callKurir() {

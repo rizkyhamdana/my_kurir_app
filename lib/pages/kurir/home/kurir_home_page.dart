@@ -1,7 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:my_kurir_app/pages/kurir/home/cubit/kurir_home_cubit.dart';
 import 'package:my_kurir_app/util/session_manager.dart';
-import '../../widgets/glass_container.dart';
+import '../../../widgets/glass_container.dart';
 
 class KurirHomePage extends StatefulWidget {
   const KurirHomePage({super.key});
@@ -19,38 +22,20 @@ class _KurirHomePageState extends State<KurirHomePage>
   late AnimationController _floatingController;
   late Animation<double> _fadeAnimation;
 
-  // ... existing initState and dispose methods ...
+  // Tambahkan variabel cubit
+  late KurirHomeCubit _homeCubit;
 
   // Method untuk toggle status
   void _toggleStatus() {
     setState(() {
       _isOnline = !_isOnline;
-    }); // Show snackbar confirmation
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            Icon(
-              _isOnline ? Icons.check_circle : Icons.cancel,
-              color: Colors.white,
-            ),
-            const SizedBox(width: 10),
-            Text(
-              _isOnline
-                  ? 'Status: Online - Siap menerima pesanan'
-                  : 'Status: Offline - Tidak menerima pesanan',
-              style: const TextStyle(fontWeight: FontWeight.w600),
-            ),
-          ],
-        ),
-        backgroundColor: _isOnline
-            ? const Color(0xFF43e97b)
-            : const Color(0xFFf5576c),
-        duration: const Duration(seconds: 3),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
-    );
+      if (_isOnline) {
+        _homeCubit.startLocationUpdates();
+      } else {
+        _homeCubit.stopLocationUpdates();
+      }
+    });
+    _homeCubit.setOnlineStatus(_isOnline);
   }
 
   Future<bool> _onWillPop() async {
@@ -118,9 +103,35 @@ class _KurirHomePageState extends State<KurirHomePage>
     return false; // batal, tetap di halaman
   }
 
+  Future<void> _fetchOnlineStatus() async {
+    final kurirId = await SessionManager.getUserId();
+    final doc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(kurirId)
+        .get();
+    if (doc.exists) {
+      final data = doc.data();
+      if (data != null && data['isOnline'] != null) {
+        setState(() {
+          _isOnline = data['isOnline'] == true;
+        });
+      }
+    }
+  }
+
   @override
   void initState() {
     super.initState();
+    _homeCubit = context.read<KurirHomeCubit>();
+    // Mulai update lokasi jika online
+    _fetchOnlineStatus().then((_) {
+      // Mulai update lokasi jika online
+      if (_isOnline) {
+        _homeCubit.startLocationUpdates();
+      }
+      setState(() => _isLoading = false);
+      _controller.forward();
+    });
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 800),
@@ -154,69 +165,114 @@ class _KurirHomePageState extends State<KurirHomePage>
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-    return PopScope(
-      canPop: false, // agar pop dikontrol manual
-      onPopInvokedWithResult: (didPop, _) async {
-        if (didPop) return;
-        await _onWillPop(); // panggil fungsi konfirmasi logout
-      },
-      child: Scaffold(
-        body: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: isDarkMode
-                  ? [
-                      const Color(0xFF0A0E21),
-                      const Color(0xFF1D1E33),
-                      const Color(0xFF2A2D3A),
-                      const Color(0xFF0A0E21),
-                    ]
-                  : [
-                      const Color(0xFFE8F0FE),
-                      const Color(0xFFF8F9FB),
-                      const Color(0xFFE3F2FD),
-                      const Color(0xFFF1F8E9),
-                    ],
+    return BlocListener<KurirHomeCubit, KurirHomeState>(
+      listener: (context, state) {
+        if (state is KurirHomeStatusLoading) {
+          // Tampilkan loading misal pakai dialog atau overlay
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (_) => const Center(child: CircularProgressIndicator()),
+          );
+        } else {
+          // Tutup dialog loading jika ada
+          if (Navigator.of(context).canPop()) Navigator.of(context).pop();
+        }
+        if (state is KurirHomeStatusSuccess) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  Icon(
+                    _isOnline ? Icons.check_circle : Icons.cancel,
+                    color: Colors.white,
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    _isOnline
+                        ? 'Status: Online - Siap menerima pesanan'
+                        : 'Status: Offline - Tidak menerima pesanan',
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                ],
+              ),
+              backgroundColor: _isOnline
+                  ? const Color(0xFF43e97b)
+                  : const Color(0xFFf5576c),
+              duration: const Duration(seconds: 3),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
-          ),
-          child: SafeArea(
-            child: _isLoading
-                ? _buildLoadingScreen()
-                : FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: SingleChildScrollView(
-                      physics: const BouncingScrollPhysics(),
-                      padding: const EdgeInsets.all(20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Animated Header
-                          _buildHeader(context),
+          );
+        }
+        // TODO: implement listener
+      },
+      child: PopScope(
+        canPop: false, // agar pop dikontrol manual
+        onPopInvokedWithResult: (didPop, _) async {
+          if (didPop) return;
+          await _onWillPop(); // panggil fungsi konfirmasi logout
+        },
+        child: Scaffold(
+          body: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: isDarkMode
+                    ? [
+                        const Color(0xFF0A0E21),
+                        const Color(0xFF1D1E33),
+                        const Color(0xFF2A2D3A),
+                        const Color(0xFF0A0E21),
+                      ]
+                    : [
+                        const Color(0xFFE8F0FE),
+                        const Color(0xFFF8F9FB),
+                        const Color(0xFFE3F2FD),
+                        const Color(0xFFF1F8E9),
+                      ],
+              ),
+            ),
+            child: SafeArea(
+              child: _isLoading
+                  ? _buildLoadingScreen()
+                  : FadeTransition(
+                      opacity: _fadeAnimation,
+                      child: SingleChildScrollView(
+                        physics: const BouncingScrollPhysics(),
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Animated Header
+                            _buildHeader(context),
 
-                          const SizedBox(height: 30),
-                          _buildStatusBanner(),
-                          const SizedBox(height: 20),
+                            const SizedBox(height: 30),
+                            _buildStatusBanner(),
+                            const SizedBox(height: 20),
 
-                          // Floating Hero Banner
-                          _buildHeroBanner(context),
+                            // Floating Hero Banner
+                            _buildHeroBanner(context),
 
-                          const SizedBox(height: 40),
+                            const SizedBox(height: 40),
 
-                          // Quick Stats
-                          _buildQuickStats(),
-                          const SizedBox(height: 30),
+                            // Quick Stats
+                            _buildQuickStats(),
+                            const SizedBox(height: 30),
 
-                          // Info Cards
-                          _buildSectionTitle('📋 Info Kurir'),
-                          const SizedBox(height: 20),
-                          _buildEnhancedInfoCards(),
-                          const SizedBox(height: 30),
-                        ],
+                            // Info Cards
+                            _buildSectionTitle('📋 Info Kurir'),
+                            const SizedBox(height: 20),
+                            _buildEnhancedInfoCards(),
+                            const SizedBox(height: 30),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
+            ),
           ),
         ),
       ),

@@ -33,6 +33,7 @@ class UserModel {
   final UserRole role;
   final String? fcmToken;
   final GeoPoint? location;
+  final DateTime? lastLocationUpdated;
   final DateTime? lastLogin;
   final DateTime? createdAt;
   final bool isOnline;
@@ -42,6 +43,7 @@ class UserModel {
     required this.name,
     required this.phone,
     required this.role,
+    this.lastLocationUpdated,
     this.email,
     this.fcmToken,
     this.location,
@@ -58,9 +60,11 @@ class UserModel {
       name: data['name'] ?? '',
       email: data['email'],
       phone: data['phone'] ?? '',
+
       role: _stringToRole(data['role']),
       fcmToken: data['fcmToken'],
       location: data['location'],
+      lastLocationUpdated: data['lastLocationUpdated'],
       lastLogin: (data['lastLogin'] as Timestamp?)?.toDate(),
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       isOnline: data['isOnline'] ?? true,
@@ -75,6 +79,7 @@ class UserModel {
       'role': role.name,
       'fcmToken': fcmToken,
       'location': location,
+      'lastLocationUpdated': lastLocationUpdated,
       'lastLogin': lastLogin != null ? Timestamp.fromDate(lastLogin!) : null,
       'createdAt': createdAt != null
           ? Timestamp.fromDate(createdAt!)

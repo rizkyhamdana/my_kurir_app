@@ -1,5 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:my_kurir_app/models/info_layanan.dart';
+import 'package:my_kurir_app/models/tariff_model.dart';
 import 'package:my_kurir_app/util/performace_util.dart';
 import 'package:my_kurir_app/util/session_manager.dart';
 import '../../widgets/glass_container.dart';
@@ -17,6 +20,31 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   late AnimationController _controller;
   late AnimationController _floatingController;
   late Animation<double> _fadeAnimation;
+
+  TariffModel? _tariff;
+  InfoLayananModel? _infoLayanan;
+  bool _infoLoading = true;
+
+  Future<void> _fetchInfoLayanan() async {
+    final infoDoc = await FirebaseFirestore.instance
+        .collection('settings')
+        .doc('infoLayanan')
+        .get();
+    final tariffDoc = await FirebaseFirestore.instance
+        .collection('settings')
+        .doc('tariff')
+        .get();
+
+    setState(() {
+      _infoLayanan = infoDoc.exists
+          ? InfoLayananModel.fromFirestore(infoDoc.data()!)
+          : null;
+      _tariff = tariffDoc.exists
+          ? TariffModel.fromFirestore(tariffDoc.data()!)
+          : null;
+      _infoLoading = false;
+    });
+  }
 
   Future<bool> _onWillPop() async {
     final result = await showModalBottomSheet<bool>(
@@ -85,6 +113,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    _fetchInfoLayanan();
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 800),
@@ -168,8 +197,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           const SizedBox(height: 40),
 
                           // Quick Stats
-                          _buildQuickStats(),
-                          const SizedBox(height: 30),
+                          // _buildQuickStats(),
+                          // const SizedBox(height: 30),
 
                           // Service Cards with staggered animation
                           _buildSectionTitle('🚀 Layanan Kami'),
@@ -1062,12 +1091,18 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   // }
 
   Widget _buildEnhancedInfoCards() {
+    if (_infoLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (_infoLayanan == null || _tariff == null) {
+      return const Text('Informasi layanan belum tersedia.');
+    }
     return Column(
       children: [
         _buildEnhancedInfoCard(
           icon: Icons.access_time_rounded,
           title: 'Jam Operasional',
-          content: 'Senin - Minggu\n08:00 - 20:00 WIB',
+          content: _infoLayanan!.jamOperasional,
           color: const Color(0xFF4facfe),
           subtitle: 'Melayani setiap hari',
         ),
@@ -1076,7 +1111,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           icon: Icons.payments_rounded,
           title: 'Tarif Pengiriman',
           content:
-              'Dalam desa: Rp 3.000\nAntar desa: Rp 5.000\nUrgent: +Rp 2.000',
+              'Dalam desa: Rp ${_tariff!.dalamDesa}\nAntar desa: Rp ${_tariff!.antarDesa}\nUrgent: +Rp ${_tariff!.urgent}',
           color: const Color(0xFF43e97b),
           subtitle: 'Harga terjangkau untuk semua',
         ),
@@ -1084,7 +1119,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         _buildEnhancedInfoCard(
           icon: Icons.support_agent_rounded,
           title: 'Kontak Darurat',
-          content: 'WhatsApp: +62 812-3456-7890\nRespon cepat 24/7',
+          content: _infoLayanan!.kontak,
           color: const Color(0xFFfa709a),
           subtitle: 'Siap membantu kapan saja',
         ),
@@ -1163,7 +1198,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    content,
+                    content.replaceAll(r'\n', '\n'),
                     style: TextStyle(
                       fontSize: 14,
                       color: textColor.withAlpha(180),

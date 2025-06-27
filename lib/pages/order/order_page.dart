@@ -453,8 +453,10 @@ class _OrderPageState extends State<OrderPage> {
                           const SizedBox(height: 15),
                           GlassContainer(
                             width: double.infinity,
-                            padding: const EdgeInsets.all(20),
+                            padding: const EdgeInsets.all(0),
                             child: _loadingKurir
+                                ? const Text('Tidak ada kurir online saat ini.')
+                                : _kurirList.isEmpty
                                 ? const Text('Tidak ada kurir online saat ini.')
                                 : Column(
                                     crossAxisAlignment:
@@ -528,7 +530,7 @@ class _OrderPageState extends State<OrderPage> {
                                     ],
                                   ),
                           ),
-                          const SizedBox(height: 30),
+                          const SizedBox(height: 16),
                           GlassContainer(
                             width: double.infinity,
                             padding: const EdgeInsets.all(20),
@@ -593,7 +595,7 @@ class _OrderPageState extends State<OrderPage> {
                               ),
                             ),
                           ),
-                          const SizedBox(height: 30),
+                          const SizedBox(height: 16),
 
                           // Urgent Checkbox
                           GlassContainer(
@@ -743,14 +745,15 @@ class _OrderPageState extends State<OrderPage> {
                               ],
                             ),
                             child: ElevatedButton(
-                              onPressed: () {
-                                if (_formKey.currentState!.validate()) {
-                                  _submitOrder();
-                                }
-                              },
+                              onPressed: (_kurirList.isEmpty)
+                                  ? null // tombol disabled jika kurir ko
+                                  : () {
+                                      _submitOrder();
+                                    },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.transparent,
                                 shadowColor: Colors.transparent,
+                                disabledBackgroundColor: Colors.grey,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(20),
                                 ),
@@ -952,9 +955,28 @@ class _OrderPageState extends State<OrderPage> {
 
   void _submitOrder() async {
     // final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    if (_formKey.currentState?.validate() != true) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Silakan lengkapi semua field yang wajib.'),
+        ),
+      );
+      return;
+    }
+
     if (_selectedKurirModel == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Silakan pilih kurir terlebih dahulu.')),
+      );
+      return;
+    }
+    if (_jemputLatLng == null || _antarLatLng == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Silakan pilih lokasi jemput dan antar dengan klik icon titik maps.',
+          ),
+        ),
       );
       return;
     }
@@ -970,8 +992,9 @@ class _OrderPageState extends State<OrderPage> {
       lngAntar: _antarLatLng?.longitude.toString(),
       latJemput: _jemputLatLng?.latitude.toString(),
       lngJemput: _jemputLatLng?.longitude.toString(),
-      nama: _namaController.text,
-      phone: _phoneController.text,
+      nama: await SessionManager.getUserName() ?? '',
+      phone: await SessionManager.getUserPhone() ?? '',
+
       alamatJemput: _alamatJemputController.text,
       alamatAntar: _alamatAntarController.text,
       jenisBarang: _jenisBarang,
@@ -1044,7 +1067,8 @@ class _OrderPageState extends State<OrderPage> {
                   ),
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.of(context).pop();
+                      Navigator.of(context).pop(); // Tutup dialog
+                      context.go('/home');
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.transparent,

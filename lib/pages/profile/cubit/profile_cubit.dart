@@ -26,6 +26,8 @@ class ProfileCubit extends Cubit<ProfileState> {
         return;
       }
       final user = UserModel.fromFirestore(doc);
+      await SessionManager.saveUserName(user.name);
+      await SessionManager.saveUserPhone(user.phone);
       emit(ProfileLoaded(user));
     } catch (e) {
       emit(ProfileFailure('Gagal memuat profil'));

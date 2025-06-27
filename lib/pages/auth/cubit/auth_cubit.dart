@@ -39,7 +39,7 @@ class AuthCubit extends Cubit<AuthState> {
           name: name,
           email: email,
           phone: phone,
-          role: UserRole.courier, // ← ini enum-nya
+          role: UserRole.customer, // ← ini enum-nya
           fcmToken: await SessionManager.getFcmToken(),
           location: null,
 

@@ -79,7 +79,11 @@ class _PickLocationPageState extends State<PickLocationPage> {
       floatingActionButton: _pickedLatLng != null
           ? FloatingActionButton.extended(
               onPressed: () {
-                Navigator.pop(context, _pickedLatLng);
+                final roundedLatLng = LatLng(
+                  double.parse(_pickedLatLng!.latitude.toStringAsFixed(6)),
+                  double.parse(_pickedLatLng!.longitude.toStringAsFixed(6)),
+                );
+                Navigator.pop(context, roundedLatLng);
               },
               label: const Text('Pilih Lokasi Ini'),
               icon: const Icon(Icons.check),

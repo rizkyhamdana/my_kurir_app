@@ -136,12 +136,6 @@ class OrderModel {
     };
   }
 
-  int get totalCost {
-    int baseCost = 3000; // Tarif dasar
-    if (isUrgent) baseCost += 2000;
-    return baseCost;
-  }
-
   Map<String, dynamic> toJson() {
     return {
       'id': id,

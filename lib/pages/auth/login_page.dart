@@ -67,6 +67,11 @@ class _LoginPageState extends State<LoginPage> {
               .get();
           final role = userDoc['role'] ?? 'customer';
 
+          final userName = userDoc['name'] ?? '';
+          final userPhone = userDoc['phone'] ?? '';
+          await SessionManager.saveUserName(userName);
+          await SessionManager.saveUserPhone(userPhone);
+
           await SessionManager.saveLoginSession(userId ?? '', role);
 
           if (role == UserRole.courier.name) {

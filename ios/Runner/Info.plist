@@ -33,10 +33,6 @@
 			<key>NSAllowsArbitraryLoads</key>
 			<true />
 		</dict>
-		<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-		<string>Aplikasi membutuhkan akses lokasi untuk memilih titik penjemputan/antar di peta.</string>
-		<key>NSLocationWhenInUseUsageDescription</key>
-		<string>Aplikasi membutuhkan akses lokasi untuk memilih titik penjemputan/antar di peta.</string>
 		<key>UIApplicationSupportsIndirectInputEvents</key>
 		<true />
 		<key>UIBackgroundModes</key>
@@ -65,5 +61,11 @@
 		</array>
 		<key>NSLocalNetworkUsageDescription</key>
 		<string>Aplikasi ini membutuhkan akses jaringan lokal untuk debug dan komunikasi perangkat.</string>
+		<key>NSLocationWhenInUseUsageDescription</key>
+		<string>App membutuhkan akses lokasi untuk tracking kurir.</string>
+		<key>NSLocationAlwaysUsageDescription</key>
+		<string>App membutuhkan akses lokasi untuk tracking kurir.</string>
+		<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+		<string>App membutuhkan akses lokasi untuk tracking kurir.</string>
 	</dict>
 </plist>

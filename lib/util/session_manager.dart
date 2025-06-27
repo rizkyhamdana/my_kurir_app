@@ -6,6 +6,28 @@ class SessionManager {
   static const _keyLoginTimestamp = 'loginTimestamp';
   static const _keyOnboarding = 'isOnboardingShown';
   static const _keyFcmToken = 'fcmToken';
+  static const _userName = 'userName';
+  static const _userPhone = 'userPhone';
+
+  static Future<void> saveUserName(String userName) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_userName, userName);
+  }
+
+  static Future<String?> getUserName() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_userName);
+  }
+
+  static Future<void> saveUserPhone(String userPhone) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_userPhone, userPhone);
+  }
+
+  static Future<String?> getUserPhone() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_userPhone);
+  }
 
   static Future<void> saveFcmToken(String token) async {
     final prefs = await SharedPreferences.getInstance();

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:my_kurir_app/pages/history/cubit/history_cubit.dart';
 import '../../models/order_model.dart';
 import '../../widgets/glass_container.dart';
 import 'dart:ui';
@@ -24,12 +26,10 @@ class _HistoryPageState extends State<HistoryPage>
     'Dalam Proses',
   ];
 
-  // Dummy data untuk history (ganti dengan data Firestore pada implementasi nyata)
-  late List<OrderModel> _historyOrders;
-
   @override
   void initState() {
     super.initState();
+    context.read<HistoryCubit>().fetchHistory();
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
@@ -39,39 +39,32 @@ class _HistoryPageState extends State<HistoryPage>
       curve: Curves.easeInOut,
     );
 
-    _initializeDummyData();
     _controller.forward();
   }
 
-  void _initializeDummyData() {
-    _historyOrders = [
-      // ...tambahkan data lain sesuai kebutuhan
-    ];
-  }
-
-  List<OrderModel> get _filteredOrders {
-    if (_selectedFilter == 'Semua') return _historyOrders;
-
+  List<OrderModel> _filterOrders(List<OrderModel> orders) {
+    if (_selectedFilter == 'Semua') return orders;
     switch (_selectedFilter) {
       case 'Selesai':
-        return _historyOrders
+        return orders
             .where((order) => order.status == OrderStatus.delivered)
             .toList();
       case 'Dibatalkan':
-        return _historyOrders
+        return orders
             .where((order) => order.status == OrderStatus.cancelled)
             .toList();
       case 'Dalam Proses':
-        return _historyOrders
+        return orders
             .where(
               (order) =>
                   order.status == OrderStatus.pending ||
                   order.status == OrderStatus.confirmed ||
-                  order.status == OrderStatus.onTheWay,
+                  order.status == OrderStatus.onTheWay ||
+                  order.status == OrderStatus.pickingUp,
             )
             .toList();
       default:
-        return _historyOrders;
+        return orders;
     }
   }
 
@@ -216,20 +209,36 @@ class _HistoryPageState extends State<HistoryPage>
 
                 // Orders List
                 Expanded(
-                  child: _filteredOrders.isEmpty
-                      ? _buildEmptyState()
-                      : ListView.builder(
+                  child: BlocBuilder<HistoryCubit, HistoryState>(
+                    builder: (context, state) {
+                      if (state is HistoryLoading || state is HistoryInitial) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      if (state is HistoryFailure) {
+                        return Center(child: Text(state.message));
+                      }
+                      if (state is HistoryLoaded) {
+                        final filtered = _filterOrders(state.orders);
+                        if (filtered.isEmpty) {
+                          return _buildEmptyState();
+                        }
+                        return ListView.builder(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           physics: const BouncingScrollPhysics(),
-                          itemCount: _filteredOrders.length,
+                          itemCount: filtered.length,
                           itemBuilder: (context, index) {
-                            final order = _filteredOrders[index];
+                            final order = filtered[index];
                             return Padding(
                               padding: const EdgeInsets.only(bottom: 15),
                               child: _buildOrderCard(order),
                             );
                           },
-                        ),
+                        );
+                      }
+
+                      return _buildEmptyState();
+                    },
+                  ),
                 ),
               ],
             ),
@@ -273,7 +282,7 @@ class _HistoryPageState extends State<HistoryPage>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          order.id,
+                          '#${order.id}',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -495,7 +504,7 @@ class _HistoryPageState extends State<HistoryPage>
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Total: Rp ${order.totalCost}',
+                    'Total: Rp ${order.total}',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -741,7 +750,7 @@ class _HistoryPageState extends State<HistoryPage>
                             ),
                           ),
                           Text(
-                            order.id,
+                            '#${order.id}',
                             style: TextStyle(
                               fontSize: 14,
                               color: order.status.color,
@@ -791,7 +800,7 @@ class _HistoryPageState extends State<HistoryPage>
                         _buildDetailRow(
                           '💰',
                           'Total Ongkir',
-                          'Rp ${order.totalCost}',
+                          'Rp ${order.total}',
                         ),
                         _buildDetailRow(
                           '📊',
@@ -810,7 +819,8 @@ class _HistoryPageState extends State<HistoryPage>
                 // Action Buttons
                 Row(
                   children: [
-                    if (order.status == OrderStatus.onTheWay) ...[
+                    if (!(order.status == OrderStatus.delivered ||
+                        order.status == OrderStatus.cancelled)) ...[
                       Expanded(
                         child: Container(
                           height: 45,
@@ -854,51 +864,52 @@ class _HistoryPageState extends State<HistoryPage>
                           ),
                         ),
                       ),
-                      const SizedBox(width: 12),
                     ],
-                    Expanded(
-                      child: Container(
-                        height: 45,
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF43e97b), Color(0xFF38f9d7)],
-                          ),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                            _reorderDialog(order);
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.transparent,
-                            shadowColor: Colors.transparent,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          child: const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.refresh_rounded,
-                                color: Colors.white,
-                                size: 18,
-                              ),
-                              SizedBox(width: 8),
-                              Text(
-                                'Pesan Lagi',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
+                    //   if ((order.status == OrderStatus.delivered ||
+                    //       order.status == OrderStatus.cancelled))
+                    //     Expanded(
+                    //       child: Container(
+                    //         height: 45,
+                    //         decoration: BoxDecoration(
+                    //           gradient: const LinearGradient(
+                    //             colors: [Color(0xFF43e97b), Color(0xFF38f9d7)],
+                    //           ),
+                    //           borderRadius: BorderRadius.circular(12),
+                    //         ),
+                    //         child: ElevatedButton(
+                    //           onPressed: () {
+                    //             Navigator.of(context).pop();
+                    //             _reorderDialog(order);
+                    //           },
+                    //           style: ElevatedButton.styleFrom(
+                    //             backgroundColor: Colors.transparent,
+                    //             shadowColor: Colors.transparent,
+                    //             shape: RoundedRectangleBorder(
+                    //               borderRadius: BorderRadius.circular(12),
+                    //             ),
+                    //           ),
+                    //           child: const Row(
+                    //             mainAxisAlignment: MainAxisAlignment.center,
+                    //             children: [
+                    //               Icon(
+                    //                 Icons.refresh_rounded,
+                    //                 color: Colors.white,
+                    //                 size: 18,
+                    //               ),
+                    //               SizedBox(width: 8),
+                    //               Text(
+                    //                 'Pesan Lagi',
+                    //                 style: TextStyle(
+                    //                   color: Colors.white,
+                    //                   fontWeight: FontWeight.bold,
+                    //                   fontSize: 14,
+                    //                 ),
+                    //               ),
+                    //             ],
+                    //           ),
+                    //         ),
+                    //       ),
+                    //     ),
                   ],
                 ),
                 const SizedBox(height: 12),
@@ -980,142 +991,6 @@ class _HistoryPageState extends State<HistoryPage>
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  void _reorderDialog(OrderModel order) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final textColor =
-        Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white;
-
-    showDialog(
-      context: context,
-      builder: (context) => BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Dialog(
-          backgroundColor: Colors.transparent,
-          child: GlassContainer(
-            padding: const EdgeInsets.all(25),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(15),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF43e97b), Color(0xFF38f9d7)],
-                    ),
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  child: const Icon(
-                    Icons.refresh_rounded,
-                    color: Colors.white,
-                    size: 30,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  'Pesan Lagi?',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: textColor,
-                  ),
-                ),
-                const SizedBox(height: 15),
-                Text(
-                  'Apakah Anda ingin memesan kurir dengan detail yang sama seperti pesanan sebelumnya?',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: textColor.withAlpha(170),
-                    height: 1.4,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 25),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        height: 45,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: isDarkMode
-                                ? Colors.white.withAlpha(77)
-                                : Colors.black.withAlpha(77),
-                          ),
-                        ),
-                        child: ElevatedButton(
-                          onPressed: () => Navigator.of(context).pop(),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.transparent,
-                            shadowColor: Colors.transparent,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          child: Text(
-                            'Batal',
-                            style: TextStyle(
-                              color: textColor,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Container(
-                        height: 45,
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF43e97b), Color(0xFF38f9d7)],
-                          ),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                            context.push('/order');
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: const Text(
-                                  'Data pesanan telah diisi otomatis',
-                                ),
-                                backgroundColor: const Color(0xFF43e97b),
-                                behavior: SnackBarBehavior.floating,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.transparent,
-                            shadowColor: Colors.transparent,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          child: const Text(
-                            'Ya, Pesan',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
       ),
     );
   }
