@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -36,7 +38,7 @@ class TrackingCubit extends Cubit<TrackingState> {
         emit(TrackingLoaded(order));
       }
     } catch (e, stackTrace) {
-      print('Error fetching active order: $e\n$stackTrace');
+      log('Error fetching active order: $e\n$stackTrace');
       emit(TrackingFailure('Gagal memuat pesanan aktif'));
     }
   }
@@ -54,7 +56,7 @@ class TrackingCubit extends Cubit<TrackingState> {
       // Setelah cancel, fetch ulang pesanan aktif
       await fetchActiveOrder();
     } catch (e, stackTrace) {
-      print('Error cancelling order: $e\n$stackTrace');
+      log('Error cancelling order: $e\n$stackTrace');
       emit(TrackingFailure('Gagal membatalkan pesanan'));
     }
   }
@@ -71,7 +73,7 @@ class TrackingCubit extends Cubit<TrackingState> {
           });
       await fetchActiveOrder();
     } catch (e, stackTrace) {
-      print('Error completing order: $e\n$stackTrace');
+      log('Error completing order: $e\n$stackTrace');
       emit(TrackingFailure('Gagal menyelesaikan pesanan'));
     }
   }

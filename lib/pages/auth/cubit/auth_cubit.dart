@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -55,7 +57,7 @@ class AuthCubit extends Cubit<AuthState> {
 
       emit(AuthSuccess(userCredential.user));
     } on FirebaseAuthException catch (e, stackTrace) {
-      print('FirebaseAuthException: $e\n$stackTrace');
+      log('FirebaseAuthException: $e\n$stackTrace');
       emit(AuthFailure(e.message ?? 'Registrasi gagal'));
     } catch (e) {
       emit(AuthFailure('Terjadi kesalahan'));
@@ -81,10 +83,10 @@ class AuthCubit extends Cubit<AuthState> {
           .doc(userId);
       final userDoc = await userDocRef.get();
       final role = userDoc['role'] ?? 'customer';
-      print('User role: $role');
-      print('Expected role: $expectedRole');
-      print('User Role Courier: ${UserRole.courier.name}');
-      print('User Role Customer: ${UserRole.customer.name}');
+      log('User role: $role');
+      log('Expected role: $expectedRole');
+      log('User Role Courier: ${UserRole.courier.name}');
+      log('User Role Customer: ${UserRole.customer.name}');
       // Validasi role jika perlu
       if ((expectedRole == UserRole.courier.name &&
               role != UserRole.courier.name) ||

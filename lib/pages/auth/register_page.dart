@@ -390,7 +390,6 @@ class _RegisterPageState extends State<RegisterPage> {
           _showSuccessDialog();
         }
         if (state is AuthFailure) {
-          print('Masuk Disini??');
           _showErrorDialog('Registrasi Gagal', state.message);
         }
       },

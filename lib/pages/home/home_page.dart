@@ -611,95 +611,95 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildQuickStats() {
-    // final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+  // Widget _buildQuickStats() {
+  //   // final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-    return Row(
-      children: [
-        Expanded(
-          child: _buildStatCard(
-            '150+',
-            'Pesanan Selesai',
-            Icons.check_circle_rounded,
-            const Color(0xFF43e97b),
-          ),
-        ),
-        const SizedBox(width: 15),
-        Expanded(
-          child: _buildStatCard(
-            '4.9',
-            'Rating\nKurir',
-            Icons.star_rounded,
-            const Color(0xFFffd700),
-          ),
-        ),
-        const SizedBox(width: 15),
-        Expanded(
-          child: _buildStatCard(
-            '24/7',
-            '\nLayanan',
-            Icons.access_time_rounded,
-            const Color(0xFF4facfe),
-          ),
-        ),
-      ],
-    );
-  }
+  //   return Row(
+  //     children: [
+  //       Expanded(
+  //         child: _buildStatCard(
+  //           '150+',
+  //           'Pesanan Selesai',
+  //           Icons.check_circle_rounded,
+  //           const Color(0xFF43e97b),
+  //         ),
+  //       ),
+  //       const SizedBox(width: 15),
+  //       Expanded(
+  //         child: _buildStatCard(
+  //           '4.9',
+  //           'Rating\nKurir',
+  //           Icons.star_rounded,
+  //           const Color(0xFFffd700),
+  //         ),
+  //       ),
+  //       const SizedBox(width: 15),
+  //       Expanded(
+  //         child: _buildStatCard(
+  //           '24/7',
+  //           '\nLayanan',
+  //           Icons.access_time_rounded,
+  //           const Color(0xFF4facfe),
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
 
-  Widget _buildStatCard(
-    String value,
-    String label,
-    IconData icon,
-    Color color,
-  ) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final textColor =
-        Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white;
+  // Widget _buildStatCard(
+  //   String value,
+  //   String label,
+  //   IconData icon,
+  //   Color color,
+  // ) {
+  //   final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+  //   final textColor =
+  //       Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white;
 
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: (isDarkMode ? Colors.white : Colors.black).withAlpha(13),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      child: GlassContainer(
-        padding: const EdgeInsets.all(20),
-        borderRadius: BorderRadius.circular(20),
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: color.withAlpha(51),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(icon, color: color, size: 24),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              value,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: textColor,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(fontSize: 12, color: textColor.withAlpha(180)),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  //   return Container(
+  //     decoration: BoxDecoration(
+  //       borderRadius: BorderRadius.circular(20),
+  //       boxShadow: [
+  //         BoxShadow(
+  //           color: (isDarkMode ? Colors.white : Colors.black).withAlpha(13),
+  //           blurRadius: 15,
+  //           offset: const Offset(0, 5),
+  //         ),
+  //       ],
+  //     ),
+  //     child: GlassContainer(
+  //       padding: const EdgeInsets.all(20),
+  //       borderRadius: BorderRadius.circular(20),
+  //       child: Column(
+  //         children: [
+  //           Container(
+  //             padding: const EdgeInsets.all(10),
+  //             decoration: BoxDecoration(
+  //               color: color.withAlpha(51),
+  //               borderRadius: BorderRadius.circular(12),
+  //             ),
+  //             child: Icon(icon, color: color, size: 24),
+  //           ),
+  //           const SizedBox(height: 12),
+  //           Text(
+  //             value,
+  //             style: TextStyle(
+  //               fontSize: 20,
+  //               fontWeight: FontWeight.bold,
+  //               color: textColor,
+  //             ),
+  //           ),
+  //           const SizedBox(height: 4),
+  //           Text(
+  //             label,
+  //             style: TextStyle(fontSize: 12, color: textColor.withAlpha(180)),
+  //             textAlign: TextAlign.center,
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget _buildSectionTitle(String title) {
     final textColor =

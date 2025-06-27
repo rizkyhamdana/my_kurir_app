@@ -23,8 +23,7 @@ class KurirProfileCubit extends Cubit<KurirProfileState> {
       } else {
         emit(KurirProfileFailure('Data kurir tidak ditemukan.'));
       }
-    } catch (e, stackTrace) {
-      print('Error fetching profile: $e');
+    } catch (e) {
       emit(KurirProfileFailure('Gagal memuat profil.'));
     }
   }

@@ -90,7 +90,6 @@ class _KurirProfilePageState extends State<KurirProfilePage> {
                       // Profile Header
                       BlocBuilder<KurirProfileCubit, KurirProfileState>(
                         builder: (context, state) {
-                          print('State: $state');
                           if (state is KurirProfileLoading) {
                             return const Center(
                               child: CircularProgressIndicator(),
@@ -412,49 +411,49 @@ class _KurirProfilePageState extends State<KurirProfilePage> {
     );
   }
 
-  Widget _buildStatItem(
-    BuildContext context,
-    String value,
-    String label,
-    IconData icon,
-    Color color,
-  ) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+  // Widget _buildStatItem(
+  //   BuildContext context,
+  //   String value,
+  //   String label,
+  //   IconData icon,
+  //   Color color,
+  // ) {
+  //   final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-    return Container(
-      padding: const EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        color: color.withAlpha(26),
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: color.withAlpha(77)),
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: color, size: 24),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: isDarkMode ? Colors.white : Colors.black87,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              color: isDarkMode
-                  ? Colors.white.withAlpha(179)
-                  : Colors.black87.withAlpha(179),
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
+  //   return Container(
+  //     padding: const EdgeInsets.all(15),
+  //     decoration: BoxDecoration(
+  //       color: color.withAlpha(26),
+  //       borderRadius: BorderRadius.circular(15),
+  //       border: Border.all(color: color.withAlpha(77)),
+  //     ),
+  //     child: Column(
+  //       children: [
+  //         Icon(icon, color: color, size: 24),
+  //         const SizedBox(height: 8),
+  //         Text(
+  //           value,
+  //           style: TextStyle(
+  //             fontSize: 18,
+  //             fontWeight: FontWeight.bold,
+  //             color: isDarkMode ? Colors.white : Colors.black87,
+  //           ),
+  //         ),
+  //         const SizedBox(height: 4),
+  //         Text(
+  //           label,
+  //           style: TextStyle(
+  //             fontSize: 12,
+  //             color: isDarkMode
+  //                 ? Colors.white.withAlpha(179)
+  //                 : Colors.black87.withAlpha(179),
+  //           ),
+  //           textAlign: TextAlign.center,
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget _buildModernMenuItem(
     BuildContext context, {
@@ -975,6 +974,7 @@ class _KurirProfilePageState extends State<KurirProfilePage> {
 
                             await SessionManager.clearSession();
                             await FirebaseAuth.instance.signOut();
+                            if (!context.mounted) return;
                             context.go('/login');
                           },
                           style: ElevatedButton.styleFrom(

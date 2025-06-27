@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -60,18 +61,19 @@ Future<void> setupFirebaseMessaging() async {
       settings.authorizationStatus == AuthorizationStatus.provisional) {
     if (Platform.isIOS || Platform.isMacOS) {
       final apnsToken = await messaging.getAPNSToken();
-      print('📱 APNS Token: $apnsToken');
+
+      log('📱 APNS Token: $apnsToken');
 
       // 💡 Jangan panggil getToken kalau APNS token belum tersedia
       if (apnsToken == null) {
-        print('⏳ APNS belum siap, tunda getToken.');
+        log('⏳ APNS belum siap, tunda getToken.');
         return;
       }
     }
 
     // ✅ Aman untuk ambil FCM Token
     final token = await messaging.getToken();
-    print('📦 FCM Token: $token');
+    log('📦 FCM Token: $token');
 
     if (token != null) {
       await SessionManager.saveFcmToken(token);
@@ -114,7 +116,7 @@ Future<void> setupFirebaseMessaging() async {
       }
     });
   } else {
-    print('🔒 Not authorized for notifications.');
+    log('🔒 Not authorized for notifications.');
   }
 }
 
