@@ -156,8 +156,7 @@ flutter analyze
 <!-- Tambahkan screenshots aplikasi di sini -->
 | Onboarding | Home | Order | Tracking |
 |------------|------|-------|----------|
-| ![Onboarding](screenshots/onboarding.png) | ![Home](screenshots/home.png) | ![Order](screenshots/order.png) | ![Tracking](screenshots/tracking.png) |
-
+| <img src="screenshots/onboarding.png" width="200"/> | <img src="screenshots/home.png" width="200"/> | <img src="screenshots/order.png" width="200"/> | <img src="screenshots/tracking.png" width="200"/> |
 ## 🚀 Deployment
 
 ### Android (Google Play Store)
